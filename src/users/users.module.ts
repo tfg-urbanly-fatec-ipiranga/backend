@@ -6,6 +6,7 @@ import { CloudinaryService } from 'src/common/services/cloudinary/cloudinary.ser
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService, PrismaService, CloudinaryService]
+  providers: [UsersService,
+    PrismaService, CloudinaryService]
 })
 export class UsersModule { }
