@@ -1,4 +1,4 @@
-import { IsString, IsOptional } from "class-validator"
+import { IsString, IsOptional, IsNumber } from "class-validator"
 
 export class CreatePlaceDto {
     @IsString()
@@ -16,6 +16,12 @@ export class CreatePlaceDto {
 
     @IsString()
     federalTaxPayerId: string
+
+    @IsNumber()
+    latitude: number
+
+    @IsNumber()
+    longitude: number
 }
 
 export class UpdatePlaceDto {

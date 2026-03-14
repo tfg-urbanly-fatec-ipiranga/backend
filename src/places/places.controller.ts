@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from '@nestjs/common';
 import { PlacesService } from './places.service';
 import { CreatePlaceDto, UpdatePlaceDto } from './places.dto';
+import { AddTagDto } from 'src/tags/tags.dto';
 
 @Controller({
     version: '1',
@@ -35,6 +36,14 @@ export class PlacesController {
         if (!place) throw new NotFoundException('Place not found')
 
         return this.placesService.update(params.id, body)
+    }
+
+    @Post(':id/tags')
+    async addTagToPlace(
+        @Param('id') placeId: string,
+        @Body() body: AddTagDto,
+    ) {
+        return this.placesService.addTag(placeId, body.tagName);
     }
 
     @Delete(':id')

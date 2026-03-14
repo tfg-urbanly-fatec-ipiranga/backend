@@ -13,33 +13,56 @@ enum Role {
 }
 
 model User {
-  id String @id @default(uuid())
-  firstName String 
-  lastName String
-  userName String @unique
-  email String @unique
-  password String
-  role Role @default(USER)
-  avatar String?
+  id        String  @id @default(uuid())
+  firstName String
+  lastName  String
+  userName  String  @unique
+  email     String  @unique
+  password  String
+  role      Role    @default(USER)
+  avatar    String?
 
   birthDate DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Place {
-  id String @id @default(uuid())
-  name String
+  id          String  @id @default(uuid())
+  name        String
   description String?
 
   openingTime String
   closingTime String
 
-  latitude Float
+  latitude  Float
   longitude Float
 
   federalTaxPayerId String @unique
 
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  placeTags PlaceTag[]
+}
+
+model Tag {
+  id   String @id @default(uuid())
+  name String @unique
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  placeTags PlaceTag[]
+}
+
+model PlaceTag {
+  placeId String
+  tagId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  place Place @relation(fields: [placeId], references: [id])
+  tag Tag @relation(fields: [tagId], references: [id])
+
+  @@id([placeId, tagId])
 }
