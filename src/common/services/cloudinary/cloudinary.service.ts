@@ -12,31 +12,31 @@ export class CloudinaryService {
         })
     }
 
-    async upload(file: Express.Multer.File, name: string): Promise<{url: string}> {
+    async upload(file: Express.Multer.File, name: string): Promise<{ url: string }> {
         return new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
-            {
-                public_id: name,
-                folder: 'avatars',
-                format: 'jpg',
-                quality: 'auto'
-            },
-            (error, result) => {
-                if (error || !result) {
-                console.error('Cloudinary error:', error);
-                reject(error);
-                } else {
-                const url = cloudinary.url(result.public_id, {
-                    fetch_format: 'auto',
+                {
+                    public_id: name,
+                    folder: 'avatars',
+                    format: 'jpg',
                     quality: 'auto'
-                });
-                resolve({ url });
+                },
+                (error, result) => {
+                    if (error || !result) {
+                        console.error('Cloudinary error:', error);
+                        reject(error);
+                    } else {
+                        const url = cloudinary.url(result.public_id, {
+                            fetch_format: 'auto',
+                            quality: 'auto'
+                        });
+                        resolve({ url });
+                    }
                 }
-            }
             );
 
             // FIX: streamifier cria stream correto
             streamifier.createReadStream(file.buffer!).pipe(uploadStream);
         });
-        }
+    }
 }

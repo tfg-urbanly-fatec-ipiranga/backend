@@ -35,6 +35,9 @@ model Place {
   openingTime String
   closingTime String
 
+  latitude Float
+  longitude Float
+
   federalTaxPayerId String @unique
 
   createdAt DateTime @default(now())

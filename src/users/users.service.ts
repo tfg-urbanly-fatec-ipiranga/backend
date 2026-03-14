@@ -4,7 +4,7 @@ import { CreateUserDto, UpdateUserDto } from "./users.dto";
 
 @Injectable()
 export class UsersService {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(private readonly prisma: PrismaService) { }
 
 	private readonly select = {
 		id: true,

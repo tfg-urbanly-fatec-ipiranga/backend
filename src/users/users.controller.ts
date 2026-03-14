@@ -20,11 +20,11 @@ export class UsersController {
     }
 
     @Get(':id')
-    async findById(@Param() params: { id: string }) {
-        const user = await this.usersService.findById(params.id)
+    async findById(@Param('id', ParseUUIDPipe) id: string) {
+        const user = await this.usersService.findById(id)
 
-        if(!user) throw new NotFoundException('User not found')
-        
+        if (!user) throw new NotFoundException('User not found')
+
         return user
     }
 
@@ -32,7 +32,7 @@ export class UsersController {
     async findByEmail(@Param() params: { email: string }) {
         const user = await this.usersService.findByEmail(params.email)
 
-        if(!user) throw new NotFoundException('User not found')
+        if (!user) throw new NotFoundException('User not found')
 
         return user
     }
@@ -41,7 +41,7 @@ export class UsersController {
     async findByUserName(@Param() params: { userName: string }) {
         const user = await this.usersService.findByUserName(params.userName)
 
-        if(!user) throw new NotFoundException('User not found')
+        if (!user) throw new NotFoundException('User not found')
 
         return user
     }
@@ -55,7 +55,7 @@ export class UsersController {
     async update(@Param() params: { id: string }, @Body() body: UpdateUserDto) {
         const user = await this.usersService.findById(params.id)
 
-        if(!user) throw new NotFoundException('User not found')
+        if (!user) throw new NotFoundException('User not found')
 
         return this.usersService.update(params.id, body)
     }
@@ -69,7 +69,7 @@ export class UsersController {
 
         const user = await this.usersService.findById(userId)
 
-        if(!user) throw new NotFoundException('User not found')
+        if (!user) throw new NotFoundException('User not found')
 
         await this.usersService.update(userId, {
             avatar: response.url
@@ -82,7 +82,7 @@ export class UsersController {
     async delete(@Param() params: { id: string }) {
         const user = await this.usersService.findById(params.id)
 
-        if(!user) throw new NotFoundException('User not found')
+        if (!user) throw new NotFoundException('User not found')
 
         return this.usersService.delete(params.id)
     }
