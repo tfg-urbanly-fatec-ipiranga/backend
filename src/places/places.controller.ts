@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Query } from '@nestjs/common';
 import { PlacesService } from './places.service';
-import { CreatePlaceDto, UpdatePlaceDto } from './places.dto';
+import { CreatePlaceDto, FindPlacesByTagDto, UpdatePlaceDto } from './places.dto';
 import { AddTagDto } from 'src/tags/tags.dto';
 
 @Controller({
@@ -18,6 +18,11 @@ export class PlacesController {
     @Get()
     findAll() {
         return this.placesService.findAll()
+    }
+
+    @Get('search')
+    searchByTag(@Query() query: FindPlacesByTagDto) {
+        return this.placesService.findByTag(query);
     }
 
     @Get(':id')

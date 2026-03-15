@@ -42,3 +42,9 @@ export class UpdatePlaceDto {
     closingTime?: string
 
 }
+
+
+export class SearchPlacesByTagDto {
+    @IsString()
+    tag: string
+}

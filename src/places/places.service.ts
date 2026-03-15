@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreatePlaceDto, UpdatePlaceDto } from './places.dto';
+import { CreatePlaceDto, FindPlacesByTagDto, UpdatePlaceDto } from './places.dto';
 import { TagsService } from 'src/tags/tags.service';
 
 @Injectable()
@@ -40,6 +40,28 @@ export class PlacesService {
             where: { id },
             select: this.select,
         })
+    }
+
+    async findByTag(dto: FindPlacesByTagDto) {
+        const tag = dto.tag.trim().toLowerCase();
+
+        if (tag.length === 0) {
+            return [];
+        }
+
+        return this.prisma.place.findMany({
+            where: {
+                placeTags: {
+                    some: {
+                        tag: {
+                            name: { equals: tag, mode: 'insensitive' }
+                        }
+                    }
+                }
+            },
+            select: this.select,
+            orderBy: { name: 'asc' }
+        });
     }
 
     async update(id: string, data: UpdatePlaceDto) {
