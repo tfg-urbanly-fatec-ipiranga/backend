@@ -44,7 +44,7 @@ export class UpdatePlaceDto {
 }
 
 
-export class SearchPlacesByTagDto {
+export class FindPlacesByTagDto {
     @IsString()
     tag: string
 }
