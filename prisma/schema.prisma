@@ -13,56 +13,108 @@ enum Role {
 }
 
 model User {
-  id        String  @id @default(uuid())
-  firstName String
-  lastName  String
-  userName  String  @unique
-  email     String  @unique
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
   password  String
-  role      Role    @default(USER)
+  role      Role     @default(USER)
   avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  birthDate DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  reviews   Review[]
+  favorites Favorite[]
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  iconColor   String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  places Place[]
 }
 
 model Place {
-  id          String  @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   description String?
-
+  address     String?
+  city        String?
   openingTime String
   closingTime String
+  latitude    Float
+  longitude   Float
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  latitude  Float
-  longitude Float
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
 
-  federalTaxPayerId String @unique
-
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
   placeTags PlaceTag[]
+  reviews   Review[]
+  favorites Favorite[]
+  photos    PlacePhoto[]
 }
 
 model Tag {
-  id   String @id @default(uuid())
-  name String @unique
-
+  id        String   @id @default(uuid())
+  name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   placeTags PlaceTag[]
 }
 
 model PlaceTag {
-  placeId String
-  tagId String
-
+  placeId   String
+  tagId     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   place Place @relation(fields: [placeId], references: [id])
-  tag Tag @relation(fields: [tagId], references: [id])
+  tag   Tag   @relation(fields: [tagId], references: [id])
 
   @@id([placeId, tagId])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId  String
+  placeId String
+  user    User  @relation(fields: [userId], references: [id])
+  place   Place @relation(fields: [placeId], references: [id])
+
+  @@unique([userId, placeId])
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  userId  String
+  placeId String
+  user    User  @relation(fields: [userId], references: [id])
+  place   Place @relation(fields: [placeId], references: [id])
+
+  @@unique([userId, placeId])
+}
+
+model PlacePhoto {
+  id        String   @id @default(uuid())
+  url       String
+  caption   String?
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  placeId String
+  place   Place @relation(fields: [placeId], references: [id])
 }

@@ -1,50 +1,73 @@
-import { IsString, IsOptional, IsNumber } from "class-validator"
+import { IsString, IsOptional, IsNumber, IsBoolean } from "class-validator";
 
 export class CreatePlaceDto {
-    @IsString()
-    name: string
+  @IsString()
+  name: string;
 
-    @IsString()
-    @IsOptional()
-    description?: string
+  @IsString()
+  @IsOptional()
+  description?: string;
 
-    @IsString()
-    openingTime: string
+  @IsString()
+  @IsOptional()
+  address?: string;
 
-    @IsString()
-    closingTime: string
+  @IsString()
+  @IsOptional()
+  city?: string;
 
-    @IsString()
-    federalTaxPayerId: string
+  @IsString()
+  openingTime: string;
 
-    @IsNumber()
-    latitude: number
+  @IsString()
+  closingTime: string;
 
-    @IsNumber()
-    longitude: number
+  @IsNumber()
+  latitude: number;
+
+  @IsNumber()
+  longitude: number;
+
+  @IsString()
+  @IsOptional()
+  categoryId?: string;
 }
 
 export class UpdatePlaceDto {
-    @IsString()
-    @IsOptional()
-    name?: string
+  @IsString()
+  @IsOptional()
+  name?: string;
 
-    @IsString()
-    @IsOptional()
-    description?: string
+  @IsString()
+  @IsOptional()
+  description?: string;
 
-    @IsString()
-    @IsOptional()
-    openingTime?: string
+  @IsString()
+  @IsOptional()
+  address?: string;
 
-    @IsString()
-    @IsOptional()
-    closingTime?: string
+  @IsString()
+  @IsOptional()
+  city?: string;
 
+  @IsString()
+  @IsOptional()
+  openingTime?: string;
+
+  @IsString()
+  @IsOptional()
+  closingTime?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  active?: boolean;
+
+  @IsString()
+  @IsOptional()
+  categoryId?: string;
 }
 
-
 export class FindPlacesByTagDto {
-    @IsString()
-    tag: string
+  @IsString()
+  tag: string;
 }
