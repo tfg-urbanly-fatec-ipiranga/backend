@@ -15,75 +15,77 @@
 erDiagram
 
     USUARIO {
-        uuid id_usuario PK
-        string nome
-        string email UK
-        string senha_hash
-        string foto_perfil
-        string tipo_usuario
-        datetime criado_em
-        datetime atualizado_em
+        UUID id_usuario PK
+        TEXT nome
+        TEXT email UK
+        TEXT senha_hash
+        TEXT foto_perfil
+        TEXT tipo_usuario
+        TIMESTAMP criado_em
+        TIMESTAMP atualizado_em
     }
 
     CATEGORIA {
-        uuid id_categoria PK
-        string nome
-        string cor_icone
-        string descricao
-        datetime criado_em
-        datetime atualizado_em
+        UUID id_categoria PK
+        TEXT nome
+        TEXT cor_icone
+        TEXT descricao
+        TIMESTAMP criado_em
+        TIMESTAMP atualizado_em
     }
 
     ESTABELECIMENTO {
-        uuid id_estabelecimento PK
-        uuid id_categoria FK
-        string nome
-        string descricao
-        string endereco
-        string cidade
-        string horario_funcionamento
-        boolean ativo
-        datetime criado_em
-        datetime atualizado_em
+        UUID id_estabelecimento PK
+        UUID id_categoria FK
+        TEXT nome
+        TEXT descricao
+        TEXT endereco
+        TEXT cidade
+        DECIMAL latitude
+        DECIMAL longitude
+        TEXT horario_funcionamento
+        BOOLEAN ativo
+        TIMESTAMP criado_em
+        TIMESTAMP atualizado_em
     }
 
     FOTO_ESTABELECIMENTO {
-        uuid id_foto PK
-        uuid id_estabelecimento FK
-        string url_foto
-        string legenda
-        boolean principal
-        datetime criado_em
+        UUID id_foto PK
+        UUID id_estabelecimento FK
+        TEXT url_foto
+        TEXT legenda
+        BOOLEAN principal
+        TIMESTAMP criado_em
     }
 
     PALAVRA_CHAVE {
-        uuid id_palavra_chave PK
-        string nome
-        datetime criado_em
+        UUID id_palavra_chave PK
+        TEXT nome
+        TIMESTAMP criado_em
     }
 
     ESTABELECIMENTO_PALAVRA_CHAVE {
-        uuid id_estabelecimento_palavra_chave PK
-        uuid id_estabelecimento FK
-        uuid id_palavra_chave FK
-        datetime criado_em
+        UUID id_estabelecimento_palavra_chave PK
+        UUID id_estabelecimento FK
+        UUID id_palavra_chave FK
+        TIMESTAMP criado_em
     }
 
     AVALIACAO {
-        uuid id_avaliacao PK
-        uuid id_usuario FK
-        uuid id_estabelecimento FK
-        int nota
-        string comentario
-        datetime criado_em
-        datetime atualizado_em
+        UUID id_avaliacao PK
+        UUID id_usuario FK
+        UUID id_estabelecimento FK
+        INTEGER nota
+        TEXT comentario
+        TIMESTAMP criado_em
+        TIMESTAMP atualizado_em
     }
 
     FAVORITO {
-        uuid id_favorito PK
-        uuid id_usuario FK
-        uuid id_estabelecimento FK
-        datetime criado_em
+        UUID id_favorito PK
+        UUID id_usuario FK
+        UUID id_estabelecimento FK
+        TIMESTAMP criado_em
     }
 
     CATEGORIA ||--o{ ESTABELECIMENTO : classifica
