@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePlaceDto, FindPlacesByTagDto, UpdatePlaceDto } from './places.dto';
 import { TagsService } from 'src/tags/tags.service';
@@ -43,6 +43,10 @@ export class PlacesService {
     }
 
     async findByTag(dto: FindPlacesByTagDto) {
+        if (!dto.tag) {
+            throw new BadRequestException('tag query param is required');
+        }
+
         const tag = dto.tag.trim().toLowerCase();
 
         if (tag.length === 0) {
