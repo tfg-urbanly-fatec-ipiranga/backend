@@ -50,6 +50,14 @@ export class PlacesController {
     return this.placesService.addTag(placeId, body.tagName);
   }
 
+  @Delete(":id/tags/:tagId")
+  async removeTagFromPlace(
+    @Param("id", ParseUUIDPipe) placeId: string,
+    @Param("tagId", ParseUUIDPipe) tagId: string,
+  ) {
+    return this.placesService.removeTag(placeId, tagId);
+  }
+
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const place = await this.placesService.findById(id);

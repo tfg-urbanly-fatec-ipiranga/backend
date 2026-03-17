@@ -9,6 +9,7 @@ import { TagsModule } from "./tags/tags.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { ReviewsModule } from "./reviews/reviews.module";
 import { FavoritesModule } from "./favorites/favorites.module";
+import { PlacePhotosModule } from "./place-photos/place-photos.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { FavoritesModule } from "./favorites/favorites.module";
     CategoriesModule,
     ReviewsModule,
     FavoritesModule,
+    PlacePhotosModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, CloudinaryService],

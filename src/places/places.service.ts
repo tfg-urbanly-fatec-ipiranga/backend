@@ -82,6 +82,12 @@ export class PlacesService {
     });
   }
 
+  async removeTag(placeId: string, tagId: string) {
+    return this.prisma.placeTag.delete({
+      where: { placeId_tagId: { placeId, tagId } },
+    });
+  }
+
   async delete(id: string) {
     return this.prisma.place.delete({ where: { id } });
   }
