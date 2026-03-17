@@ -1,3 +1,9 @@
+ignoredBuiltDependencies:
+  - '@nestjs/core'
+  - '@prisma/client'
+  - '@scarf/scarf'
+  - bcrypt
+  - unrs-resolver
 onlyBuiltDependencies:
   - "@prisma/engines"
   - prisma
