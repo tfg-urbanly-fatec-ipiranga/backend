@@ -10,9 +10,11 @@ import { CategoriesModule } from "./categories/categories.module";
 import { ReviewsModule } from "./reviews/reviews.module";
 import { FavoritesModule } from "./favorites/favorites.module";
 import { PlacePhotosModule } from "./place-photos/place-photos.module";
+import { AuthModule } from "./auth/auth.module";
 
 @Module({
   imports: [
+    AuthModule,
     UsersModule,
     PlacesModule,
     TagsModule,
