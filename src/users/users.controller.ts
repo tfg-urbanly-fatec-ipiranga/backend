@@ -41,10 +41,12 @@ export class UsersController {
     return this.usersService.update(id, body);
   }
 
-  @Post("avatar")
+  @Post(":id/avatar")
   @UseInterceptors(FileInterceptor("file"))
-  async uploadAvatar(@UploadedFile() file: Express.Multer.File) {
-    const userId = "b3761bd3-079f-49bf-9718-848dda2b2ca9";
+  async uploadAvatar(
+    @Param("id", ParseUUIDPipe) userId: string,
+    @UploadedFile() file: Express.Multer.File
+  ) {
     const response = await this.cloudinaryService.upload(file, userId);
     const user = await this.usersService.findById(userId);
     if (!user) throw new NotFoundException("User not found");

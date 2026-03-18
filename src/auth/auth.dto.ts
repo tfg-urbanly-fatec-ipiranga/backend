@@ -10,6 +10,9 @@ export class RegisterDto {
   @IsString()
   @MinLength(6)
   password: string;
+
+  @IsString()
+  birthDate: string;
 }
 
 export class LoginDto {
