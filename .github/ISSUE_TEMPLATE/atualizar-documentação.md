@@ -8,8 +8,8 @@ type: Task
 
 ---
 
-[ ] Diagrama de classes
-[ ] Plano de testes
-[ ] Requisitos
-[ ] MER
-[ ] Especificação de casos de uso
+- [ ] Diagrama de classes
+- [ ] Plano de testes
+- [ ] Requisitos
+- [ ] MER
+- [ ] Especificação de casos de uso
