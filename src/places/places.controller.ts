@@ -20,8 +20,8 @@ export class PlacesController {
     return this.placesService.findAll();
   }
 
-  @Get("search")
-  searchByTag(@Query() query: FindPlacesByTagDto) {
+  @Get("findByTag")
+  findByTag(@Query() query: FindPlacesByTagDto) {
     return this.placesService.findByTag(query);
   }
 
