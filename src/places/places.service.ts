@@ -1,7 +1,8 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { CreatePlaceDto, FindPlacesByTagDto, UpdatePlaceDto } from "./places.dto";
+import { CreatePlaceDto, FindPlacesByTagDto, SearchPlacesByNameDto, UpdatePlaceDto } from "./places.dto";
 import { TagsService } from "src/tags/tags.service";
+import { Place } from "@prisma/client";
 
 @Injectable()
 export class PlacesService {
@@ -66,6 +67,23 @@ export class PlacesService {
       orderBy: { name: "asc" },
     });
   }
+
+  async searchByName(dto: SearchPlacesByNameDto) {
+  console.log('Buscando por:', dto.searchTerm)
+
+  const places = await this.prisma.$queryRaw<Place[]>`
+    SELECT * FROM "Place"
+    WHERE name % ${dto.searchTerm}
+    ORDER BY similarity(name, ${dto.searchTerm}) DESC
+    LIMIT 10
+  `;
+
+  if (!places || places.length === 0) {
+    throw new NotFoundException("No places found");
+  } 
+
+  return places;
+}
 
   async update(id: string, data: UpdatePlaceDto) {
     return this.prisma.place.update({

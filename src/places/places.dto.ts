@@ -71,3 +71,8 @@ export class FindPlacesByTagDto {
   @IsString()
   tag: string;
 }
+
+export class SearchPlacesByNameDto {
+  @IsString()
+  searchTerm: string;
+}

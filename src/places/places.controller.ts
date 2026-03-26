@@ -3,7 +3,7 @@ import {
   Param, ParseUUIDPipe, Post, Put, Query,
 } from "@nestjs/common";
 import { PlacesService } from "./places.service";
-import { CreatePlaceDto, FindPlacesByTagDto, UpdatePlaceDto } from "./places.dto";
+import { CreatePlaceDto, FindPlacesByTagDto, SearchPlacesByNameDto, UpdatePlaceDto } from "./places.dto";
 import { AddTagDto } from "src/tags/tags.dto";
 
 @Controller({ version: "1", path: "places" })
@@ -23,6 +23,11 @@ export class PlacesController {
   @Get("search")
   searchByTag(@Query() query: FindPlacesByTagDto) {
     return this.placesService.findByTag(query);
+  }
+
+  @Get("searchByName")
+  searchByName(@Query() query: SearchPlacesByNameDto) {
+    return this.placesService.searchByName(query);
   }
 
   @Get(":id")

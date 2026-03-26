@@ -11,6 +11,7 @@ import { ReviewsModule } from "./reviews/reviews.module";
 import { FavoritesModule } from "./favorites/favorites.module";
 import { PlacePhotosModule } from "./place-photos/place-photos.module";
 import { AuthModule } from "./auth/auth.module";
+import { BuscaModule } from './busca/busca.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthModule } from "./auth/auth.module";
     ReviewsModule,
     FavoritesModule,
     PlacePhotosModule,
+    BuscaModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, CloudinaryService],
