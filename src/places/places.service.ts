@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { CreatePlaceDto, FindPlacesByTagDto, SearchPlacesByNameDto, UpdatePlaceDto } from "./places.dto";
+import { CreatePlaceDto, FindPlacesByTagDto, FullSearchDto, UpdatePlaceDto } from "./places.dto";
 import { TagsService } from "src/tags/tags.service";
 import { Place } from "@prisma/client";
 
@@ -68,22 +68,21 @@ export class PlacesService {
     });
   }
 
-  async searchByName(dto: SearchPlacesByNameDto) {
-  console.log('Buscando por:', dto.searchTerm)
+  async fullSearch(dto: FullSearchDto) {
+    const places = await this.prisma.$queryRaw<Place[]>`
+      SELECT DISTINCT "p".* FROM "Place" "p"
+      INNER JOIN "PlaceTag" "pt" ON "p"."id" = "pt"."placeId"
+      INNER JOIN "Tag" "t" ON "pt"."tagId" = "t"."id"
+      WHERE "p"."name" % ${dto.searchTerm} 
+      OR "t"."name" % ${dto.searchTerm}
+    `
 
-  const places = await this.prisma.$queryRaw<Place[]>`
-    SELECT * FROM "Place"
-    WHERE name % ${dto.searchTerm}
-    ORDER BY similarity(name, ${dto.searchTerm}) DESC
-    LIMIT 10
-  `;
+    if (!places || places.length === 0) {
+      throw new NotFoundException("No places found");
+    } 
 
-  if (!places || places.length === 0) {
-    throw new NotFoundException("No places found");
-  } 
-
-  return places;
-}
+    return places; 
+  }
 
   async update(id: string, data: UpdatePlaceDto) {
     return this.prisma.place.update({

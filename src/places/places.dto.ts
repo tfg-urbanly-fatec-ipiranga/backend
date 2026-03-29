@@ -72,7 +72,7 @@ export class FindPlacesByTagDto {
   tag: string;
 }
 
-export class SearchPlacesByNameDto {
+export class FullSearchDto {
   @IsString()
   searchTerm: string;
 }
