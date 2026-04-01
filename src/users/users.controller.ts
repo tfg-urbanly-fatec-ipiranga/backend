@@ -3,9 +3,11 @@ import {
   Param, ParseUUIDPipe, Post, Put, UploadedFile, UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { Role } from "@prisma/client";
 import { UsersService } from "./users.service";
 import { CreateUserDto, UpdateUserDto } from "./users.dto";
 import { CloudinaryService } from "src/common/services/cloudinary/cloudinary.service";
+import { Roles } from "src/auth/roles.decorator";
 
 @Controller({ version: "1", path: "users" })
 export class UsersController {
@@ -14,6 +16,7 @@ export class UsersController {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
+  @Roles(Role.ADMIN)
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -54,6 +57,7 @@ export class UsersController {
     return this.usersService.findById(userId);
   }
 
+  @Roles(Role.ADMIN)
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const user = await this.usersService.findById(id);

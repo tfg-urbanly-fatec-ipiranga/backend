@@ -4,13 +4,17 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
 import { PrismaService } from "src/prisma/prisma.service";
 import { RegisterDto, LoginDto, ChangePasswordDto } from "./auth.dto";
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   private readonly userSelect = {
     id: true,
@@ -68,8 +72,13 @@ export class AuthService {
       throw new UnauthorizedException("Credenciais inválidas");
     }
 
-    const { password, ...result } = user;
-    return result;
+    const payload = { sub: user.id, role: user.role };
+    const { password, ...userData } = user;
+
+    return {
+      accessToken: this.jwtService.sign(payload),
+      user: userData,
+    };
   }
 
   async changePassword(data: ChangePasswordDto) {

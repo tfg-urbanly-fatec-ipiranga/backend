@@ -3,9 +3,12 @@ import {
   Param, ParseUUIDPipe, Post, Put, UploadedFile, UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { Role } from "@prisma/client";
 import { PlacePhotosService } from "./place-photos.service";
 import { CreatePlacePhotoDto, UpdatePlacePhotoDto } from "./place-photos.dto";
+import { Roles } from "src/auth/roles.decorator";
 
+@Roles(Role.ADMIN)
 @Controller({ version: "1", path: "place-photos" })
 export class PlacePhotosController {
   constructor(private readonly placePhotosService: PlacePhotosService) {}

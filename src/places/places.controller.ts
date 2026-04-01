@@ -2,29 +2,36 @@ import {
   Body, Controller, Delete, Get, NotFoundException,
   Param, ParseUUIDPipe, Post, Put, Query,
 } from "@nestjs/common";
+import { Role } from "@prisma/client";
 import { PlacesService } from "./places.service";
 import { CreatePlaceDto, FindPlacesByTagDto, FullSearchDto, UpdatePlaceDto } from "./places.dto";
 import { AddTagDto } from "src/tags/tags.dto";
+import { Public } from "src/auth/public.decorator";
+import { Roles } from "src/auth/roles.decorator";
 
 @Controller({ version: "1", path: "places" })
 export class PlacesController {
   constructor(private readonly placesService: PlacesService) {}
 
+  @Roles(Role.ADMIN)
   @Post()
   create(@Body() body: CreatePlaceDto) {
     return this.placesService.create(body);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.placesService.findAll();
   }
 
+  @Public()
   @Get("findByTag")
   findByTag(@Query() query: FindPlacesByTagDto) {
     return this.placesService.findByTag(query);
   }
 
+  @Public()
   @Get("search")
   search(@Query() query: FullSearchDto) {
     return this.placesService.fullSearch(query);
@@ -37,6 +44,7 @@ export class PlacesController {
     return place;
   }
 
+  @Roles(Role.ADMIN)
   @Put(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
@@ -47,6 +55,7 @@ export class PlacesController {
     return this.placesService.update(id, body);
   }
 
+  @Roles(Role.ADMIN)
   @Post(":id/tags")
   async addTagToPlace(
     @Param("id", ParseUUIDPipe) placeId: string,
@@ -55,6 +64,7 @@ export class PlacesController {
     return this.placesService.addTag(placeId, body.tagName);
   }
 
+  @Roles(Role.ADMIN)
   @Delete(":id/tags/:tagId")
   async removeTagFromPlace(
     @Param("id", ParseUUIDPipe) placeId: string,
@@ -63,6 +73,7 @@ export class PlacesController {
     return this.placesService.removeTag(placeId, tagId);
   }
 
+  @Roles(Role.ADMIN)
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const place = await this.placesService.findById(id);

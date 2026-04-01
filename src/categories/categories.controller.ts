@@ -2,13 +2,17 @@ import {
   Body, Controller, Delete, Get, NotFoundException,
   Param, ParseUUIDPipe, Post, Put,
 } from "@nestjs/common";
+import { Role } from "@prisma/client";
 import { CategoriesService } from "./categories.service";
 import { CreateCategoryDto, UpdateCategoryDto } from "./categories.dto";
+import { Public } from "src/auth/public.decorator";
+import { Roles } from "src/auth/roles.decorator";
 
 @Controller({ version: "1", path: "categories" })
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
+  @Public()
   @Get()
   findAll() {
     return this.categoriesService.findAll();
@@ -21,11 +25,13 @@ export class CategoriesController {
     return category;
   }
 
+  @Roles(Role.ADMIN)
   @Post()
   create(@Body() body: CreateCategoryDto) {
     return this.categoriesService.create(body);
   }
 
+  @Roles(Role.ADMIN)
   @Put(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
@@ -36,6 +42,7 @@ export class CategoriesController {
     return this.categoriesService.update(id, body);
   }
 
+  @Roles(Role.ADMIN)
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const category = await this.categoriesService.findById(id);
