@@ -1,15 +1,24 @@
 import { Role } from "@prisma/client";
-import { IsEmail, IsEnum, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsEmail, IsEnum, IsOptional, IsString } from "class-validator";
 
 export class CreateUserDto {
   @IsString()
-  name: string;
+  firstName: string;
+
+  @IsString()
+  lastName: string;
+
+  @IsString()
+  username: string;
 
   @IsEmail()
   email: string;
 
   @IsString()
   password: string;
+
+  @IsDateString()
+  birthDate: string;
 
   @IsEnum(Role)
   @IsOptional()
@@ -19,7 +28,15 @@ export class CreateUserDto {
 export class UpdateUserDto {
   @IsString()
   @IsOptional()
-  name?: string;
+  firstName?: string;
+
+  @IsString()
+  @IsOptional()
+  lastName?: string;
+
+  @IsString()
+  @IsOptional()
+  username?: string;
 
   @IsString()
   @IsOptional()

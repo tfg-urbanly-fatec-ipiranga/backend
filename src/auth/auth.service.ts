@@ -1,11 +1,12 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import { PrismaService } from "src/prisma/prisma.service";
-import { RegisterDto, LoginDto } from "./auth.dto";
+import { RegisterDto, LoginDto, ChangePasswordDto } from "./auth.dto";
 
 @Injectable()
 export class AuthService {
@@ -24,21 +25,30 @@ export class AuthService {
   };
 
   async register(data: RegisterDto) {
-    const existing = await this.prisma.user.findUnique({
+    const existingEmail = await this.prisma.user.findUnique({
       where: { email: data.email },
     });
+    if (existingEmail) {
+      throw new ConflictException("E-mail já está em uso");
+    }
 
-    if (existing) {
-      throw new ConflictException("Email already in use");
+    const existingUsername = await this.prisma.user.findUnique({
+      where: { username: data.username },
+    });
+    if (existingUsername) {
+      throw new ConflictException("Nome de usuário já está em uso");
     }
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     return this.prisma.user.create({
       data: {
-        name: data.name,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        username: data.username,
         email: data.email,
         password: hashedPassword,
+        birthDate: new Date(data.birthDate),
       },
       select: this.userSelect,
     });
@@ -54,12 +64,35 @@ export class AuthService {
     }
 
     const passwordValid = await bcrypt.compare(data.password, user.password);
-
     if (!passwordValid) {
       throw new UnauthorizedException("Credenciais inválidas");
     }
 
     const { password, ...result } = user;
     return result;
+  }
+
+  async changePassword(data: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: data.userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException("Usuário não encontrado");
+    }
+
+    const passwordValid = await bcrypt.compare(data.currentPassword, user.password);
+    if (!passwordValid) {
+      throw new UnauthorizedException("Senha atual incorreta");
+    }
+
+    const hashedPassword = await bcrypt.hash(data.newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: data.userId },
+      data: { password: hashedPassword },
+    });
+
+    return { message: "Senha atualizada com sucesso" };
   }
 }
