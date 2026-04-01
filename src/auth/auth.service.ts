@@ -19,6 +19,7 @@ export class AuthService {
     email: true,
     role: true,
     avatar: true,
+    birthDate: true,
     createdAt: true,
   };
 
