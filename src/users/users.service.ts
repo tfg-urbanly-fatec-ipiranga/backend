@@ -8,10 +8,13 @@ export class UsersService {
 
   private readonly select = {
     id: true,
-    name: true,
+    firstName: true,
+    lastName: true,
+    username: true,
     email: true,
     role: true,
     avatar: true,
+    birthDate: true,
     createdAt: true,
     updatedAt: true,
   };
