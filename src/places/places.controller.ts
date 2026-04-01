@@ -33,7 +33,7 @@ export class PlacesController {
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const place = await this.placesService.findById(id);
-    if (!place) throw new NotFoundException("Place not found");
+    if (!place) throw new NotFoundException("Estabelecimento não encontrado");
     return place;
   }
 
@@ -43,7 +43,7 @@ export class PlacesController {
     @Body() body: UpdatePlaceDto,
   ) {
     const place = await this.placesService.findById(id);
-    if (!place) throw new NotFoundException("Place not found");
+    if (!place) throw new NotFoundException("Estabelecimento não encontrado");
     return this.placesService.update(id, body);
   }
 
@@ -66,7 +66,7 @@ export class PlacesController {
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const place = await this.placesService.findById(id);
-    if (!place) throw new NotFoundException("Place not found");
+    if (!place) throw new NotFoundException("Estabelecimento não encontrado");
     return this.placesService.delete(id);
   }
 }

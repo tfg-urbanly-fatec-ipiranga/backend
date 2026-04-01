@@ -12,7 +12,7 @@ export class ReviewsService {
     comment: true,
     createdAt: true,
     updatedAt: true,
-    user: { select: { id: true, name: true } },
+    user: { select: { id: true, firstName: true, lastName: true } },
     place: { select: { id: true, name: true } },
   };
 
@@ -43,7 +43,7 @@ export class ReviewsService {
 
     if (existing) {
       throw new ConflictException(
-        "User already reviewed this place. Use PUT to update.",
+        "Usuário já avaliou este estabelecimento. Use PUT para atualizar.",
       );
     }
 

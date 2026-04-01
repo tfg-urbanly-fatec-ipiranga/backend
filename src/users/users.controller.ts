@@ -22,7 +22,7 @@ export class UsersController {
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const user = await this.usersService.findById(id);
-    if (!user) throw new NotFoundException("User not found");
+    if (!user) throw new NotFoundException("Usuário não encontrado");
     return user;
   }
 
@@ -37,7 +37,7 @@ export class UsersController {
     @Body() body: UpdateUserDto,
   ) {
     const user = await this.usersService.findById(id);
-    if (!user) throw new NotFoundException("User not found");
+    if (!user) throw new NotFoundException("Usuário não encontrado");
     return this.usersService.update(id, body);
   }
 
@@ -45,11 +45,11 @@ export class UsersController {
   @UseInterceptors(FileInterceptor("file"))
   async uploadAvatar(
     @Param("id", ParseUUIDPipe) userId: string,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    const response = await this.cloudinaryService.upload(file, userId);
     const user = await this.usersService.findById(userId);
-    if (!user) throw new NotFoundException("User not found");
+    if (!user) throw new NotFoundException("Usuário não encontrado");
+    const response = await this.cloudinaryService.upload(file, userId);
     await this.usersService.update(userId, { avatar: response.url });
     return this.usersService.findById(userId);
   }
@@ -57,7 +57,7 @@ export class UsersController {
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const user = await this.usersService.findById(id);
-    if (!user) throw new NotFoundException("User not found");
+    if (!user) throw new NotFoundException("Usuário não encontrado");
     return this.usersService.delete(id);
   }
 }

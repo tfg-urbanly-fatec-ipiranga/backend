@@ -18,7 +18,7 @@ export class PlacePhotosController {
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const photo = await this.placePhotosService.findById(id);
-    if (!photo) throw new NotFoundException("Photo not found");
+    if (!photo) throw new NotFoundException("Foto não encontrada");
     return photo;
   }
 
@@ -42,14 +42,14 @@ export class PlacePhotosController {
     @Body() body: UpdatePlacePhotoDto,
   ) {
     const photo = await this.placePhotosService.findById(id);
-    if (!photo) throw new NotFoundException("Photo not found");
+    if (!photo) throw new NotFoundException("Foto não encontrada");
     return this.placePhotosService.update(id, body);
   }
 
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const photo = await this.placePhotosService.findById(id);
-    if (!photo) throw new NotFoundException("Photo not found");
+    if (!photo) throw new NotFoundException("Foto não encontrada");
     return this.placePhotosService.delete(id);
   }
 }

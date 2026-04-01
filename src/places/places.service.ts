@@ -48,7 +48,7 @@ export class PlacesService {
 
   async findByTag(dto: FindPlacesByTagDto) {
     if (!dto.tag) {
-      throw new BadRequestException("tag query param is required");
+      throw new BadRequestException("Parâmetro tag é obrigatório");
     }
 
     const tag = dto.tag.trim().toLowerCase();
@@ -78,7 +78,7 @@ export class PlacesService {
     `
 
     if (!places || places.length === 0) {
-      throw new NotFoundException("No places found");
+      throw new NotFoundException("Nenhum estabelecimento encontrado");
     } 
 
     return places; 
