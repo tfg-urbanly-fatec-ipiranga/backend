@@ -38,13 +38,27 @@ export class UsersService {
   }
 
   create(data: CreateUserDto) {
-    return this.prisma.user.create({ data });
+    return this.prisma.user.create({
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        birthDate: new Date(data.birthDate),
+        role: data.role,
+      },
+    });
   }
 
   update(id: string, data: UpdateUserDto) {
+    const { birthDate, ...rest } = data;
     return this.prisma.user.update({
       where: { id },
-      data,
+      data: {
+        ...rest,
+        ...(birthDate && { birthDate: new Date(birthDate) }),
+      },
       select: this.select,
     });
   }
