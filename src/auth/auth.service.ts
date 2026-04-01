@@ -13,7 +13,9 @@ export class AuthService {
 
   private readonly userSelect = {
     id: true,
-    name: true,
+    firstName: true,
+    lastName: true,
+    username: true,
     email: true,
     role: true,
     avatar: true,
