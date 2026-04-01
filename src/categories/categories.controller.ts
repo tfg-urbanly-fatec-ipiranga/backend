@@ -17,7 +17,7 @@ export class CategoriesController {
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const category = await this.categoriesService.findById(id);
-    if (!category) throw new NotFoundException("Category not found");
+    if (!category) throw new NotFoundException("Categoria não encontrada");
     return category;
   }
 
@@ -32,14 +32,14 @@ export class CategoriesController {
     @Body() body: UpdateCategoryDto,
   ) {
     const category = await this.categoriesService.findById(id);
-    if (!category) throw new NotFoundException("Category not found");
+    if (!category) throw new NotFoundException("Categoria não encontrada");
     return this.categoriesService.update(id, body);
   }
 
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const category = await this.categoriesService.findById(id);
-    if (!category) throw new NotFoundException("Category not found");
+    if (!category) throw new NotFoundException("Categoria não encontrada");
     return this.categoriesService.delete(id);
   }
 }
