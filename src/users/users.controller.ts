@@ -5,9 +5,9 @@ import {
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Role } from "@prisma/client";
 import { UsersService } from "./users.service";
-import { CreateUserDto, UpdateUserDto } from "./users.dto";
 import { CloudinaryService } from "src/common/services/cloudinary/cloudinary.service";
 import { Roles } from "src/auth/roles.decorator";
+import { UpdateUserDto } from "./users.dto";
 
 @Controller({ version: "1", path: "users" })
 export class UsersController {
@@ -16,7 +16,7 @@ export class UsersController {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.USER)
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -27,11 +27,6 @@ export class UsersController {
     const user = await this.usersService.findById(id);
     if (!user) throw new NotFoundException("Usuário não encontrado");
     return user;
-  }
-
-  @Post()
-  create(@Body() body: CreateUserDto) {
-    return this.usersService.create(body);
   }
 
   @Put(":id")
