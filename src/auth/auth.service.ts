@@ -33,14 +33,14 @@ export class AuthService {
       where: { email: data.email },
     });
     if (existingEmail) {
-      throw new ConflictException("E-mail já está em uso");
+      throw new ConflictException("E-mail already in use");
     }
 
     const existingUsername = await this.prisma.user.findUnique({
       where: { username: data.username },
     });
     if (existingUsername) {
-      throw new ConflictException("Nome de usuário já está em uso");
+      throw new ConflictException("Username already in use");
     }
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -64,12 +64,12 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException("Credenciais inválidas");
+      throw new UnauthorizedException("Invalid credentials");
     }
 
     const passwordValid = await bcrypt.compare(data.password, user.password);
     if (!passwordValid) {
-      throw new UnauthorizedException("Credenciais inválidas");
+      throw new UnauthorizedException("Invalid credentials");
     }
 
     const payload = { sub: user.id, role: user.role };
@@ -87,12 +87,12 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException("Usuário não encontrado");
+      throw new NotFoundException("User not found");
     }
 
     const passwordValid = await bcrypt.compare(data.currentPassword, user.password);
     if (!passwordValid) {
-      throw new UnauthorizedException("Senha atual incorreta");
+      throw new UnauthorizedException("Invalid current password");
     }
 
     const hashedPassword = await bcrypt.hash(data.newPassword, 10);
@@ -102,6 +102,6 @@ export class AuthService {
       data: { password: hashedPassword },
     });
 
-    return { message: "Senha atualizada com sucesso" };
+    return { message: "Password changed successfully" };
   }
 }
