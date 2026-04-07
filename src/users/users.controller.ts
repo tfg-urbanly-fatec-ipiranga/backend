@@ -25,7 +25,7 @@ export class UsersController {
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const user = await this.usersService.findById(id);
-    if (!user) throw new NotFoundException("Usuário não encontrado");
+    if (!user) throw new NotFoundException("User not found");
     return user;
   }
 
@@ -35,7 +35,7 @@ export class UsersController {
     @Body() body: UpdateUserDto,
   ) {
     const user = await this.usersService.findById(id);
-    if (!user) throw new NotFoundException("Usuário não encontrado");
+    if (!user) throw new NotFoundException("User not found");
     return this.usersService.update(id, body);
   }
 
@@ -46,7 +46,7 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     const user = await this.usersService.findById(userId);
-    if (!user) throw new NotFoundException("Usuário não encontrado");
+    if (!user) throw new NotFoundException("User not found");
     const response = await this.cloudinaryService.upload(file, userId);
     await this.usersService.update(userId, { avatar: response.url });
     return this.usersService.findById(userId);
@@ -56,7 +56,7 @@ export class UsersController {
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const user = await this.usersService.findById(id);
-    if (!user) throw new NotFoundException("Usuário não encontrado");
+    if (!user) throw new NotFoundException("User not found");
     return this.usersService.delete(id);
   }
 }
