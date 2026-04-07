@@ -1,4 +1,5 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UpdateUserDto } from "./users.dto";
 
@@ -37,16 +38,27 @@ export class UsersService {
     });
   }
 
-  update(id: string, data: UpdateUserDto) {
+  async update(id: string, data: UpdateUserDto) {
     const { birthDate, ...rest } = data;
-    return this.prisma.user.update({
-      where: { id },
-      data: {
-        ...rest,
-        ...(birthDate && { birthDate: new Date(birthDate) }),
-      },
-      select: this.select,
-    });
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data: {
+          ...rest,
+          ...(birthDate && { birthDate: new Date(birthDate) }),
+        },
+        select: this.select,
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        const field = (e.meta?.target as string[])?.[0] ?? 'field';
+        throw new ConflictException(`${field} already in use`);
+      }
+      throw e;
+    }
   }
 
   delete(id: string) {
