@@ -1,7 +1,8 @@
 import {
-  Body, Controller, Delete, Get, NotFoundException,
+  Controller, Delete, Get, NotFoundException,
   Param, ParseUUIDPipe, Post, Put,
 } from "@nestjs/common";
+import { RequiredBody } from "src/common/decorators/required-body.decorator";
 import { ReviewsService } from "./reviews.service";
 import { CreateReviewDto, UpdateReviewDto } from "./reviews.dto";
 
@@ -22,14 +23,14 @@ export class ReviewsController {
   }
 
   @Post()
-  create(@Body() body: CreateReviewDto) {
+  create(@RequiredBody() body: CreateReviewDto) {
     return this.reviewsService.create(body);
   }
 
   @Put(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() body: UpdateReviewDto,
+    @RequiredBody() body: UpdateReviewDto,
   ) {
     const review = await this.reviewsService.findById(id);
     if (!review) throw new NotFoundException("Avaliação não encontrada");

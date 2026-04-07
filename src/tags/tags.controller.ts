@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
+import { RequiredBody } from 'src/common/decorators/required-body.decorator';
 import { TagsService } from './tags.service';
 import { AddTagDto } from './tags.dto';
 
@@ -12,7 +13,7 @@ export class TagsController {
     }
 
     @Post()
-    create(@Body() dto: AddTagDto) {
+    create(@RequiredBody() dto: AddTagDto) {
         return this.tagsService.getOrCreateTag(dto.tagName);
     }
 }

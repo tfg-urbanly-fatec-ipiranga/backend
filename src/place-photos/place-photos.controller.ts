@@ -1,7 +1,8 @@
 import {
-  Body, Controller, Delete, Get, NotFoundException,
+  Controller, Delete, Get, NotFoundException,
   Param, ParseUUIDPipe, Post, Put, UploadedFile, UseInterceptors,
 } from "@nestjs/common";
+import { RequiredBody } from "src/common/decorators/required-body.decorator";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Role } from "@prisma/client";
 import { PlacePhotosService } from "./place-photos.service";
@@ -29,7 +30,7 @@ export class PlacePhotosController {
   @UseInterceptors(FileInterceptor("file"))
   upload(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: CreatePlacePhotoDto,
+    @RequiredBody() body: CreatePlacePhotoDto,
   ) {
     return this.placePhotosService.upload(
       file,
@@ -42,7 +43,7 @@ export class PlacePhotosController {
   @Put(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() body: UpdatePlacePhotoDto,
+    @RequiredBody() body: UpdatePlacePhotoDto,
   ) {
     const photo = await this.placePhotosService.findById(id);
     if (!photo) throw new NotFoundException("Foto não encontrada");

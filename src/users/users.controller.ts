@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Delete, Get, NotFoundException,
+  Controller, Delete, Get, NotFoundException,
   Param, ParseUUIDPipe, Post, Put, UploadedFile, UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -8,6 +8,7 @@ import { UsersService } from "./users.service";
 import { CloudinaryService } from "src/common/services/cloudinary/cloudinary.service";
 import { Roles } from "src/auth/roles.decorator";
 import { UpdateUserDto } from "./users.dto";
+import { RequiredBody } from "src/common/decorators/required-body.decorator";
 
 @Controller({ version: "1", path: "users" })
 export class UsersController {
@@ -32,7 +33,7 @@ export class UsersController {
   @Put(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() body: UpdateUserDto,
+    @RequiredBody() body: UpdateUserDto,
   ) {
     const user = await this.usersService.findById(id);
     if (!user) throw new NotFoundException("User not found");

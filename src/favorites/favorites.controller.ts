@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post } from "@nestjs/common";
+import { Controller, Get, Param, ParseUUIDPipe, Post } from "@nestjs/common";
+import { RequiredBody } from "src/common/decorators/required-body.decorator";
 import { FavoritesService } from "./favorites.service";
 import { ToggleFavoriteDto } from "./favorites.dto";
 
@@ -12,7 +13,7 @@ export class FavoritesController {
   }
 
   @Post()
-  toggle(@Body() body: ToggleFavoriteDto) {
+  toggle(@RequiredBody() body: ToggleFavoriteDto) {
     return this.favoritesService.toggle(body);
   }
 }
