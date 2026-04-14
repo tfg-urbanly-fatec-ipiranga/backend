@@ -14,11 +14,13 @@ import { Roles } from "src/auth/roles.decorator";
 export class PlacePhotosController {
   constructor(private readonly placePhotosService: PlacePhotosService) {}
 
+  @Roles(Role.ADMIN, Role.USER)
   @Get("place/:placeId")
   findByPlace(@Param("placeId", ParseUUIDPipe) placeId: string) {
     return this.placePhotosService.findByPlace(placeId);
   }
 
+  @Roles(Role.ADMIN, Role.USER)
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const photo = await this.placePhotosService.findById(id);
@@ -26,6 +28,7 @@ export class PlacePhotosController {
     return photo;
   }
 
+  @Roles(Role.ADMIN)
   @Post()
   @UseInterceptors(FileInterceptor("file"))
   upload(
@@ -40,6 +43,7 @@ export class PlacePhotosController {
     );
   }
 
+  @Roles(Role.ADMIN)
   @Put(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
@@ -50,6 +54,7 @@ export class PlacePhotosController {
     return this.placePhotosService.update(id, body);
   }
 
+  @Roles(Role.ADMIN)
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const photo = await this.placePhotosService.findById(id);

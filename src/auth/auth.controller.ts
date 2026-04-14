@@ -3,6 +3,8 @@ import { RequiredBody } from "src/common/decorators/required-body.decorator";
 import { AuthService } from "./auth.service";
 import { RegisterDto, LoginDto, ChangePasswordDto } from "./auth.dto";
 import { Public } from "./public.decorator";
+import { Roles } from "./roles.decorator";
+import { Role } from "@prisma/client";
 
 @Controller({ version: "1", path: "auth" })
 export class AuthController {
@@ -20,6 +22,7 @@ export class AuthController {
     return this.authService.login(body);
   }
 
+  @Roles(Role.USER, Role.ADMIN)
   @Patch("change-password")
   changePassword(@RequiredBody() body: ChangePasswordDto) {
     return this.authService.changePassword(body);

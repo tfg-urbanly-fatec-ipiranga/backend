@@ -5,7 +5,6 @@ import {
 import { Role } from "@prisma/client";
 import { CategoriesService } from "./categories.service";
 import { CreateCategoryDto, UpdateCategoryDto } from "./categories.dto";
-import { Public } from "src/auth/public.decorator";
 import { Roles } from "src/auth/roles.decorator";
 import { RequiredBody } from "src/common/decorators/required-body.decorator";
 
@@ -13,12 +12,13 @@ import { RequiredBody } from "src/common/decorators/required-body.decorator";
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
-  @Public()
+  @Roles(Role.ADMIN, Role.USER)
   @Get()
   findAll() {
     return this.categoriesService.findAll();
   }
 
+  @Roles(Role.ADMIN, Role.USER)
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const category = await this.categoriesService.findById(id);

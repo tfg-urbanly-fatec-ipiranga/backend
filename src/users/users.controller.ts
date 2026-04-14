@@ -17,12 +17,13 @@ export class UsersController {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  @Roles(Role.USER)
+  @Roles(Role.USER, Role.ADMIN)
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
+  @Roles(Role.USER, Role.ADMIN)
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const user = await this.usersService.findById(id);
@@ -30,6 +31,7 @@ export class UsersController {
     return user;
   }
 
+  @Roles(Role.USER, Role.ADMIN)
   @Put(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
@@ -40,6 +42,7 @@ export class UsersController {
     return this.usersService.update(id, body);
   }
 
+  @Roles(Role.USER, Role.ADMIN)
   @Post(":id/avatar")
   @UseInterceptors(FileInterceptor("file"))
   async uploadAvatar(

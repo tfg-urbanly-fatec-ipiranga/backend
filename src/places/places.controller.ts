@@ -20,24 +20,25 @@ export class PlacesController {
     return this.placesService.create(body);
   }
 
-  @Public()
+  @Roles(Role.ADMIN, Role.USER)
   @Get()
   findAll() {
     return this.placesService.findAll();
   }
 
-  @Public()
+  @Roles(Role.ADMIN, Role.USER)
   @Get("findByTag")
   findByTag(@Query() query: FindPlacesByTagDto) {
     return this.placesService.findByTag(query);
   }
 
-  @Public()
+  @Roles(Role.ADMIN, Role.USER)
   @Get("search")
   search(@Query() query: FullSearchDto) {
     return this.placesService.fullSearch(query);
   }
 
+  @Roles(Role.ADMIN, Role.USER)
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const place = await this.placesService.findById(id);
