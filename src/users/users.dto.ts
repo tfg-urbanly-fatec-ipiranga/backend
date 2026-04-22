@@ -1,37 +1,48 @@
 import { Role } from "@prisma/client";
-import { IsDate, IsEmail, IsEnum, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsEmail, IsEnum, IsOptional, IsString } from "class-validator";
 
 export class CreateUserDto {
   @IsString()
-  firstName: string
+  firstName: string;
+
   @IsString()
+  lastName: string;
+
+  @IsString()
+  username: string;
+
   @IsEmail()
-  email: string
+  email: string;
+
   @IsString()
-  password: string
-  @IsString()
-  lastName: string
-  @IsString()
-  userName: string
-  @IsDate()
-  @IsOptional()
-  birthDate?: Date
+  password: string;
+
+  @IsDateString()
+  birthDate: string;
+
   @IsEnum(Role)
-  role?: Role = Role.USER
+  @IsOptional()
+  role?: Role = Role.USER;
 }
 
 export class UpdateUserDto {
   @IsString()
   @IsOptional()
-  firstName?: string
-  @IsString()
-  @IsOptional()
-  lastName?: string
-  @IsDate()
-  @IsOptional()
-  birthDate?: Date
+  firstName?: string;
 
   @IsString()
   @IsOptional()
-  avatar?: string
+  lastName?: string;
+
+  @IsString()
+  @IsOptional()
+  username?: string;
+
+  @IsString()
+  @IsOptional()
+  avatar?: string;
+
+  @IsDateString()
+  @IsOptional()
+  birthDate?: string;
 }

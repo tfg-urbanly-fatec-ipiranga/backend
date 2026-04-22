@@ -3,12 +3,19 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TagsService {
-    constructor(private readonly prisma: PrismaService) { }
-    async getOrCreateTag(name: string) {
-        return await this.prisma.tag.upsert({
-            where: { name },
-            update: {},
-            create: { name },
-        });
-    }
+  constructor(private readonly prisma: PrismaService) { }
+  async getOrCreateTag(name: string) {
+    const normalized = name.trim().toLowerCase();
+
+    return this.prisma.tag.upsert({
+      where: { name: normalized },
+      update: {},
+      create: { name: normalized },
+    });
+  }
+
+  async findAll() {
+    return this.prisma.tag.findMany();
+  }
+
 }

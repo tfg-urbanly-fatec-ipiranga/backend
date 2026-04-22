@@ -4,74 +4,66 @@ import { CreateUserDto, UpdateUserDto } from "./users.dto";
 
 @Injectable()
 export class UsersService {
-	constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-	private readonly select = {
-		id: true,
-		firstName: true,
-		lastName: true,
-		userName: true,
-		email: true,
-		role: true,
-		birthDate: true,
-		createdAt: true,
-		updatedAt: true,
-	}
+  private readonly select = {
+    id: true,
+    firstName: true,
+    lastName: true,
+    username: true,
+    email: true,
+    role: true,
+    avatar: true,
+    birthDate: true,
+    createdAt: true,
+    updatedAt: true,
+  };
 
-	findAll() {
-		return this.prisma.user.findMany({
-			select: this.select
-		});
-	}
+  findAll() {
+    return this.prisma.user.findMany({ select: this.select });
+  }
 
-	findById(id: string) {
-		return this.prisma.user.findFirst({
-			where: {
-				id,
-			},
-			select: this.select
-		});
-	}
+  findById(id: string) {
+    return this.prisma.user.findFirst({
+      where: { id },
+      select: this.select,
+    });
+  }
 
-	findByUserName(userName: string) {
-		return this.prisma.user.findUnique({
-			where: {
-				userName,
-			},
-			select: this.select
-		});
-	}
+  findByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
+      select: this.select,
+    });
+  }
 
-	findByEmail(email: string) {
-		return this.prisma.user.findUnique({
-			where: {
-				email
-			},
-			select: this.select
-		});
-	}
+  create(data: CreateUserDto) {
+    return this.prisma.user.create({
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        birthDate: new Date(data.birthDate),
+        role: data.role,
+      },
+    });
+  }
 
-	create(data: CreateUserDto) {
-		return this.prisma.user.create({
-			data
-		});
-	}
+  update(id: string, data: UpdateUserDto) {
+    const { birthDate, ...rest } = data;
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(birthDate && { birthDate: new Date(birthDate) }),
+      },
+      select: this.select,
+    });
+  }
 
-	update(id: string, data: UpdateUserDto) {
-		return this.prisma.user.update({
-			where: {
-				id
-			},
-			data,
-			select: this.select
-		});
-	}
-
-	delete(id: string) {
-		return this.prisma.user.delete({
-			where: {
-				id
-			}
-		});
-	}
+  delete(id: string) {
+    return this.prisma.user.delete({ where: { id } });
+  }
 }
