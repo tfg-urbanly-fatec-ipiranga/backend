@@ -1,13 +1,14 @@
 import {
-  Body, Controller, Delete, Get, NotFoundException,
+  Controller, Delete, Get, NotFoundException,
   Param, ParseUUIDPipe, Post, Put, UploadedFile, UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Role } from "@prisma/client";
 import { UsersService } from "./users.service";
-import { CreateUserDto, UpdateUserDto } from "./users.dto";
 import { CloudinaryService } from "src/common/services/cloudinary/cloudinary.service";
 import { Roles } from "src/auth/roles.decorator";
+import { UpdateUserDto } from "./users.dto";
+import { RequiredBody } from "src/common/decorators/required-body.decorator";
 
 @Controller({ version: "1", path: "users" })
 export class UsersController {
@@ -16,34 +17,32 @@ export class UsersController {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.USER, Role.ADMIN)
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
+  @Roles(Role.USER, Role.ADMIN)
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const user = await this.usersService.findById(id);
-    if (!user) throw new NotFoundException("Usuário não encontrado");
+    if (!user) throw new NotFoundException("User not found");
     return user;
   }
 
-  @Post()
-  create(@Body() body: CreateUserDto) {
-    return this.usersService.create(body);
-  }
-
+  @Roles(Role.USER, Role.ADMIN)
   @Put(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() body: UpdateUserDto,
+    @RequiredBody() body: UpdateUserDto,
   ) {
     const user = await this.usersService.findById(id);
-    if (!user) throw new NotFoundException("Usuário não encontrado");
+    if (!user) throw new NotFoundException("User not found");
     return this.usersService.update(id, body);
   }
 
+  @Roles(Role.USER, Role.ADMIN)
   @Post(":id/avatar")
   @UseInterceptors(FileInterceptor("file"))
   async uploadAvatar(
@@ -51,7 +50,7 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     const user = await this.usersService.findById(userId);
-    if (!user) throw new NotFoundException("Usuário não encontrado");
+    if (!user) throw new NotFoundException("User not found");
     const response = await this.cloudinaryService.upload(file, userId);
     await this.usersService.update(userId, { avatar: response.url });
     return this.usersService.findById(userId);
@@ -61,7 +60,7 @@ export class UsersController {
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const user = await this.usersService.findById(id);
-    if (!user) throw new NotFoundException("Usuário não encontrado");
+    if (!user) throw new NotFoundException("User not found");
     return this.usersService.delete(id);
   }
 }

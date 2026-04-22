@@ -1,6 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { CreateUserDto, UpdateUserDto } from "./users.dto";
+import { UpdateUserDto } from "./users.dto";
 
 @Injectable()
 export class UsersService {
@@ -37,30 +38,27 @@ export class UsersService {
     });
   }
 
-  create(data: CreateUserDto) {
-    return this.prisma.user.create({
-      data: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        username: data.username,
-        email: data.email,
-        password: data.password,
-        birthDate: new Date(data.birthDate),
-        role: data.role,
-      },
-    });
-  }
-
-  update(id: string, data: UpdateUserDto) {
+  async update(id: string, data: UpdateUserDto) {
     const { birthDate, ...rest } = data;
-    return this.prisma.user.update({
-      where: { id },
-      data: {
-        ...rest,
-        ...(birthDate && { birthDate: new Date(birthDate) }),
-      },
-      select: this.select,
-    });
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data: {
+          ...rest,
+          ...(birthDate && { birthDate: new Date(birthDate) }),
+        },
+        select: this.select,
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        const field = (e.meta?.target as string[])?.[0] ?? 'field';
+        throw new ConflictException(`${field} already in use`);
+      }
+      throw e;
+    }
   }
 
   delete(id: string) {

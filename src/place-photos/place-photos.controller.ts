@@ -1,7 +1,8 @@
 import {
-  Body, Controller, Delete, Get, NotFoundException,
+  Controller, Delete, Get, NotFoundException,
   Param, ParseUUIDPipe, Post, Put, UploadedFile, UseInterceptors,
 } from "@nestjs/common";
+import { RequiredBody } from "src/common/decorators/required-body.decorator";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Role } from "@prisma/client";
 import { PlacePhotosService } from "./place-photos.service";
@@ -13,11 +14,13 @@ import { Roles } from "src/auth/roles.decorator";
 export class PlacePhotosController {
   constructor(private readonly placePhotosService: PlacePhotosService) {}
 
+  @Roles(Role.ADMIN, Role.USER)
   @Get("place/:placeId")
   findByPlace(@Param("placeId", ParseUUIDPipe) placeId: string) {
     return this.placePhotosService.findByPlace(placeId);
   }
 
+  @Roles(Role.ADMIN, Role.USER)
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const photo = await this.placePhotosService.findById(id);
@@ -25,11 +28,12 @@ export class PlacePhotosController {
     return photo;
   }
 
+  @Roles(Role.ADMIN)
   @Post()
   @UseInterceptors(FileInterceptor("file"))
   upload(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: CreatePlacePhotoDto,
+    @RequiredBody() body: CreatePlacePhotoDto,
   ) {
     return this.placePhotosService.upload(
       file,
@@ -39,16 +43,18 @@ export class PlacePhotosController {
     );
   }
 
+  @Roles(Role.ADMIN)
   @Put(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() body: UpdatePlacePhotoDto,
+    @RequiredBody() body: UpdatePlacePhotoDto,
   ) {
     const photo = await this.placePhotosService.findById(id);
     if (!photo) throw new NotFoundException("Foto não encontrada");
     return this.placePhotosService.update(id, body);
   }
 
+  @Roles(Role.ADMIN)
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const photo = await this.placePhotosService.findById(id);

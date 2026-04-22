@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Delete, Get, NotFoundException,
+  Controller, Delete, Get, NotFoundException,
   Param, ParseUUIDPipe, Post, Put, Query,
 } from "@nestjs/common";
 import { Role } from "@prisma/client";
@@ -8,6 +8,7 @@ import { CreatePlaceDto, FindPlacesByTagDto, FullSearchDto, UpdatePlaceDto } fro
 import { AddTagDto } from "src/tags/tags.dto";
 import { Public } from "src/auth/public.decorator";
 import { Roles } from "src/auth/roles.decorator";
+import { RequiredBody } from "src/common/decorators/required-body.decorator";
 
 @Controller({ version: "1", path: "places" })
 export class PlacesController {
@@ -15,32 +16,33 @@ export class PlacesController {
 
   @Roles(Role.ADMIN)
   @Post()
-  create(@Body() body: CreatePlaceDto) {
+  create(@RequiredBody() body: CreatePlaceDto) {
     return this.placesService.create(body);
   }
 
-  @Public()
+  @Roles(Role.ADMIN, Role.USER)
   @Get()
   findAll() {
     return this.placesService.findAll();
   }
 
-  @Public()
+  @Roles(Role.ADMIN, Role.USER)
   @Get("findByTag")
   findByTag(@Query() query: FindPlacesByTagDto) {
     return this.placesService.findByTag(query);
   }
 
-  @Public()
+  @Roles(Role.ADMIN, Role.USER)
   @Get("search")
   search(@Query() query: FullSearchDto) {
     return this.placesService.fullSearch(query);
   }
 
+  @Roles(Role.ADMIN, Role.USER)
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const place = await this.placesService.findById(id);
-    if (!place) throw new NotFoundException("Estabelecimento não encontrado");
+    if (!place) throw new NotFoundException("Place not found");
     return place;
   }
 
@@ -48,10 +50,10 @@ export class PlacesController {
   @Put(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() body: UpdatePlaceDto,
+    @RequiredBody() body: UpdatePlaceDto,
   ) {
     const place = await this.placesService.findById(id);
-    if (!place) throw new NotFoundException("Estabelecimento não encontrado");
+    if (!place) throw new NotFoundException("Place not found");
     return this.placesService.update(id, body);
   }
 
@@ -59,7 +61,7 @@ export class PlacesController {
   @Post(":id/tags")
   async addTagToPlace(
     @Param("id", ParseUUIDPipe) placeId: string,
-    @Body() body: AddTagDto,
+    @RequiredBody() body: AddTagDto,
   ) {
     return this.placesService.addTag(placeId, body.tagName);
   }
@@ -77,7 +79,7 @@ export class PlacesController {
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const place = await this.placesService.findById(id);
-    if (!place) throw new NotFoundException("Estabelecimento não encontrado");
+    if (!place) throw new NotFoundException("Place not found");
     return this.placesService.delete(id);
   }
 }

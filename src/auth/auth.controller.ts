@@ -1,7 +1,10 @@
-import { Body, Controller, Patch, Post } from "@nestjs/common";
+import { Controller, Patch, Post } from "@nestjs/common";
+import { RequiredBody } from "src/common/decorators/required-body.decorator";
 import { AuthService } from "./auth.service";
 import { RegisterDto, LoginDto, ChangePasswordDto } from "./auth.dto";
 import { Public } from "./public.decorator";
+import { Roles } from "./roles.decorator";
+import { Role } from "@prisma/client";
 
 @Controller({ version: "1", path: "auth" })
 export class AuthController {
@@ -9,18 +12,19 @@ export class AuthController {
 
   @Public()
   @Post("register")
-  register(@Body() body: RegisterDto) {
+  register(@RequiredBody() body: RegisterDto) {
     return this.authService.register(body);
   }
 
   @Public()
   @Post("login")
-  login(@Body() body: LoginDto) {
+  login(@RequiredBody() body: LoginDto) {
     return this.authService.login(body);
   }
 
+  @Roles(Role.USER, Role.ADMIN)
   @Patch("change-password")
-  changePassword(@Body() body: ChangePasswordDto) {
+  changePassword(@RequiredBody() body: ChangePasswordDto) {
     return this.authService.changePassword(body);
   }
 }

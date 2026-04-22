@@ -1,23 +1,24 @@
 import {
-  Body, Controller, Delete, Get, NotFoundException,
+  Controller, Delete, Get, NotFoundException,
   Param, ParseUUIDPipe, Post, Put,
 } from "@nestjs/common";
 import { Role } from "@prisma/client";
 import { CategoriesService } from "./categories.service";
 import { CreateCategoryDto, UpdateCategoryDto } from "./categories.dto";
-import { Public } from "src/auth/public.decorator";
 import { Roles } from "src/auth/roles.decorator";
+import { RequiredBody } from "src/common/decorators/required-body.decorator";
 
 @Controller({ version: "1", path: "categories" })
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
-  @Public()
+  @Roles(Role.ADMIN, Role.USER)
   @Get()
   findAll() {
     return this.categoriesService.findAll();
   }
 
+  @Roles(Role.ADMIN, Role.USER)
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const category = await this.categoriesService.findById(id);
@@ -27,7 +28,7 @@ export class CategoriesController {
 
   @Roles(Role.ADMIN)
   @Post()
-  create(@Body() body: CreateCategoryDto) {
+  create(@RequiredBody() body: CreateCategoryDto) {
     return this.categoriesService.create(body);
   }
 
@@ -35,7 +36,7 @@ export class CategoriesController {
   @Put(":id")
   async update(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() body: UpdateCategoryDto,
+    @RequiredBody() body: UpdateCategoryDto,
   ) {
     const category = await this.categoriesService.findById(id);
     if (!category) throw new NotFoundException("Categoria não encontrada");
