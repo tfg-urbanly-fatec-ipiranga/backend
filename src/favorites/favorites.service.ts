@@ -30,7 +30,7 @@ export class FavoritesService {
           placeId: data.placeId,
         },
       },
-    });
+    })
 
     if (existing) {
       await this.prisma.favorite.delete({ where: { id: existing.id } });

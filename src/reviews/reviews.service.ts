@@ -43,7 +43,7 @@ export class ReviewsService {
 
     if (existing) {
       throw new ConflictException(
-        "Usuário já avaliou este estabelecimento. Use PUT para atualizar.",
+        "User already rated this establishment. Use PUT to update.",
       );
     }
 

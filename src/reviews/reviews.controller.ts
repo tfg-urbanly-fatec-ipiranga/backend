@@ -22,7 +22,7 @@ export class ReviewsController {
   @Get(":id")
   async findById(@Param("id", ParseUUIDPipe) id: string) {
     const review = await this.reviewsService.findById(id);
-    if (!review) throw new NotFoundException("Avaliação não encontrada");
+    if (!review) throw new NotFoundException("Review not found");
     return review;
   }
 
@@ -39,7 +39,7 @@ export class ReviewsController {
     @RequiredBody() body: UpdateReviewDto,
   ) {
     const review = await this.reviewsService.findById(id);
-    if (!review) throw new NotFoundException("Avaliação não encontrada");
+    if (!review) throw new NotFoundException("Review not found");
     return this.reviewsService.update(id, body);
   }
 
@@ -47,7 +47,7 @@ export class ReviewsController {
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const review = await this.reviewsService.findById(id);
-    if (!review) throw new NotFoundException("Avaliação não encontrada");
+    if (!review) throw new NotFoundException("Review not found");
     return this.reviewsService.delete(id);
   }
 }
