@@ -16,29 +16,33 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   firstName String
   lastName  String
-  username  String   @unique
-  email     String   @unique
+  username  String    @unique
+  email     String    @unique
   password  String
-  role      Role     @default(USER)
+  role      Role      @default(USER)
   avatar    String?
   birthDate DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  active    Boolean   @default(true)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   reviews   Review[]
   favorites Favorite[]
 }
 
 model Category {
-  id          String   @id @default(uuid())
-  name        String   @unique
+  id          String    @id @default(uuid())
+  name        String    @unique
   iconColor   String?
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  active      Boolean   @default(true)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   places Place[]
 }
@@ -53,9 +57,10 @@ model Place {
   closingTime String
   latitude    Float
   longitude   Float
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  active      Boolean   @default(true)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   categoryId String?
   category   Category? @relation(fields: [categoryId], references: [id])
@@ -67,10 +72,12 @@ model Place {
 }
 
 model Tag {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(uuid())
+  name      String    @unique
+  active    Boolean   @default(true)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   placeTags PlaceTag[]
 }
@@ -88,11 +95,12 @@ model PlaceTag {
 }
 
 model Review {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   rating    Int
   comment   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   userId  String
   placeId String
@@ -115,11 +123,13 @@ model Favorite {
 }
 
 model PlacePhoto {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   url       String
   caption   String?
-  isPrimary Boolean  @default(false)
-  createdAt DateTime @default(now())
+  isPrimary Boolean   @default(false)
+  active    Boolean   @default(true)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
 
   placeId String
   place   Place @relation(fields: [placeId], references: [id])

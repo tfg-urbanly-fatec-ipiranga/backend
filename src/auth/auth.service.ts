@@ -67,13 +67,17 @@ export class AuthService {
       throw new UnauthorizedException("Invalid credentials");
     }
 
+    if (user.deletedAt) {
+      throw new UnauthorizedException("Conta desativada");
+    }
+
     const passwordValid = await bcrypt.compare(data.password, user.password);
     if (!passwordValid) {
       throw new UnauthorizedException("Invalid credentials");
     }
 
     const payload = { sub: user.id, role: user.role };
-    const { password, ...userData } = user;
+    const { password, deletedAt, ...userData } = user;
 
     return {
       accessToken: this.jwtService.sign(payload),
@@ -90,7 +94,14 @@ export class AuthService {
       throw new NotFoundException("User not found");
     }
 
-    const passwordValid = await bcrypt.compare(data.currentPassword, user.password);
+    if (user.deletedAt) {
+      throw new UnauthorizedException("Conta desativada");
+    }
+
+    const passwordValid = await bcrypt.compare(
+      data.currentPassword,
+      user.password,
+    );
     if (!passwordValid) {
       throw new UnauthorizedException("Invalid current password");
     }

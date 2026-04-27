@@ -16,24 +16,29 @@ export class UsersService {
     role: true,
     avatar: true,
     birthDate: true,
+    active: true,
+    deletedAt: true,
     createdAt: true,
     updatedAt: true,
   };
 
   findAll() {
-    return this.prisma.user.findMany({ select: this.select });
+    return this.prisma.user.findMany({
+      where: { deletedAt: null },
+      select: this.select,
+    });
   }
 
   findById(id: string) {
     return this.prisma.user.findFirst({
-      where: { id },
+      where: { id, deletedAt: null },
       select: this.select,
     });
   }
 
   findByEmail(email: string) {
-    return this.prisma.user.findUnique({
-      where: { email },
+    return this.prisma.user.findFirst({
+      where: { email, deletedAt: null },
       select: this.select,
     });
   }
@@ -52,9 +57,9 @@ export class UsersService {
     } catch (e) {
       if (
         e instanceof Prisma.PrismaClientKnownRequestError &&
-        e.code === 'P2002'
+        e.code === "P2002"
       ) {
-        const field = (e.meta?.target as string[])?.[0] ?? 'field';
+        const field = (e.meta?.target as string[])?.[0] ?? "field";
         throw new ConflictException(`${field} already in use`);
       }
       throw e;
@@ -62,6 +67,25 @@ export class UsersService {
   }
 
   delete(id: string) {
-    return this.prisma.user.delete({ where: { id } });
+    return this.prisma.user.update({
+      where: { id },
+      data: { active: false, deletedAt: new Date() },
+      select: this.select,
+    });
+  }
+
+  findInactive() {
+    return this.prisma.user.findMany({
+      where: { deletedAt: { not: null } },
+      select: this.select,
+    });
+  }
+
+  restore(id: string) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { active: true, deletedAt: null },
+      select: this.select,
+    });
   }
 }

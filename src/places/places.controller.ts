@@ -1,5 +1,5 @@
 import {
-  Controller, Delete, Get, NotFoundException,
+  Controller, Delete, Get, NotFoundException, Patch,
   Param, ParseUUIDPipe, Post, Put, Query,
 } from "@nestjs/common";
 import { Role } from "@prisma/client";
@@ -36,6 +36,12 @@ export class PlacesController {
   @Get("search")
   search(@Query() query: FullSearchDto) {
     return this.placesService.fullSearch(query);
+  }
+
+  @Roles(Role.ADMIN)
+  @Get("inactive")
+  findInactive() {
+    return this.placesService.findInactive();
   }
 
   @Roles(Role.ADMIN, Role.USER)
@@ -81,5 +87,11 @@ export class PlacesController {
     const place = await this.placesService.findById(id);
     if (!place) throw new NotFoundException("Place not found");
     return this.placesService.delete(id);
+  }
+
+  @Roles(Role.ADMIN)
+  @Patch(":id/restore")
+  async restore(@Param("id", ParseUUIDPipe) id: string) {
+    return this.placesService.restore(id);
   }
 }

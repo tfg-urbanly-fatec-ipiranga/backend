@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class TagsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
+
   async getOrCreateTag(name: string) {
     const normalized = name.trim().toLowerCase();
 
@@ -15,7 +16,8 @@ export class TagsService {
   }
 
   async findAll() {
-    return this.prisma.tag.findMany();
+    return this.prisma.tag.findMany({
+      where: { deletedAt: null },
+    });
   }
-
 }

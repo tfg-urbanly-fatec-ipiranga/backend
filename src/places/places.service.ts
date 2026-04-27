@@ -1,6 +1,15 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { CreatePlaceDto, FindPlacesByTagDto, FullSearchDto, UpdatePlaceDto } from "./places.dto";
+import {
+  CreatePlaceDto,
+  FindPlacesByTagDto,
+  FullSearchDto,
+  UpdatePlaceDto,
+} from "./places.dto";
 import { TagsService } from "src/tags/tags.service";
 import { Place } from "@prisma/client";
 
@@ -34,14 +43,14 @@ export class PlacesService {
 
   async findAll() {
     return this.prisma.place.findMany({
-      where: { active: true },
+      where: { active: true, deletedAt: null },
       select: this.select,
     });
   }
 
   async findById(id: string) {
-    return this.prisma.place.findUnique({
-      where: { id },
+    return this.prisma.place.findFirst({
+      where: { id, deletedAt: null },
       select: this.select,
     });
   }
@@ -57,6 +66,7 @@ export class PlacesService {
     return this.prisma.place.findMany({
       where: {
         active: true,
+        deletedAt: null,
         placeTags: {
           some: {
             tag: { name: { equals: tag, mode: "insensitive" } },
@@ -73,15 +83,15 @@ export class PlacesService {
       SELECT DISTINCT "p".* FROM "Place" "p"
       INNER JOIN "PlaceTag" "pt" ON "p"."id" = "pt"."placeId"
       INNER JOIN "Tag" "t" ON "pt"."tagId" = "t"."id"
-      WHERE "p"."name" % ${dto.searchTerm} 
-      OR "t"."name" % ${dto.searchTerm}
-    `
+      WHERE "p"."deletedAt" IS NULL
+      AND ("p"."name" % ${dto.searchTerm} OR "t"."name" % ${dto.searchTerm})
+    `;
 
     if (!places || places.length === 0) {
       throw new NotFoundException("No place found");
-    } 
+    }
 
-    return places; 
+    return places;
   }
 
   async update(id: string, data: UpdatePlaceDto) {
@@ -106,6 +116,25 @@ export class PlacesService {
   }
 
   async delete(id: string) {
-    return this.prisma.place.delete({ where: { id } });
+    return this.prisma.place.update({
+      where: { id },
+      data: { active: false, deletedAt: new Date() },
+      select: this.select,
+    });
+  }
+
+  findInactive() {
+    return this.prisma.place.findMany({
+      where: { deletedAt: { not: null } },
+      select: this.select,
+    });
+  }
+
+  restore(id: string) {
+    return this.prisma.place.update({
+      where: { id },
+      data: { active: true, deletedAt: null },
+      select: this.select,
+    });
   }
 }
