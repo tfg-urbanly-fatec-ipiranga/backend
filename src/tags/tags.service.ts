@@ -18,4 +18,12 @@ export class TagsService {
     return this.prisma.tag.findMany();
   }
 
+  async findByName(name: string) {
+    const normalized = name.trim().toLowerCase();
+    return this.prisma.tag.findUnique({
+      where: { name: normalized },
+      select: { id: true, name: true },
+    });
+  }
+
 }
