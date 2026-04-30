@@ -4,13 +4,14 @@ import { TagsService } from './tags.service';
 import { AddTagDto } from './tags.dto';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from '@prisma/client';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('tags')
 export class TagsController {
     constructor(private readonly tagsService: TagsService) { }
 
-    @Get()
-    @Roles(Role.USER, Role.ADMIN)
+    @Public()
+    @Get()    
     findAll() {
         return this.tagsService.findAll();
     }
