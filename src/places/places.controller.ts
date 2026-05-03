@@ -20,13 +20,13 @@ export class PlacesController {
     return this.placesService.create(body);
   }
 
-  @Roles(Role.ADMIN, Role.USER)
+  @Public()
   @Get()
   findAll() {
     return this.placesService.findAll();
   }
 
-  @Roles(Role.ADMIN, Role.USER)
+  @Public()
   @Get("findByTag")
   findByTag(@Query() query: FindPlacesByTagDto) {
     return this.placesService.findByTag(query);

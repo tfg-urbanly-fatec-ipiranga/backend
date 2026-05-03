@@ -11,7 +11,6 @@ import {
   UpdatePlaceDto,
 } from "./places.dto";
 import { TagsService } from "src/tags/tags.service";
-import { Place } from "@prisma/client";
 
 @Injectable()
 export class PlacesService {
@@ -79,20 +78,50 @@ export class PlacesService {
   }
 
   async fullSearch(dto: FullSearchDto) {
-    const places = await this.prisma.$queryRaw<Place[]>`
-      SELECT DISTINCT "p".* FROM "Place" "p"
-      INNER JOIN "PlaceTag" "pt" ON "p"."id" = "pt"."placeId"
-      INNER JOIN "Tag" "t" ON "pt"."tagId" = "t"."id"
-      WHERE "p"."deletedAt" IS NULL
-      AND ("p"."name" % ${dto.searchTerm} OR "t"."name" % ${dto.searchTerm})
+    const ids = await this.prisma.$queryRaw<{ id: string }[]>`
+      SELECT DISTINCT p."id"
+      FROM "Place" p
+      INNER JOIN "PlaceTag" pt ON p."id" = pt."placeId"
+      INNER JOIN "Tag" t ON pt."tagId" = t."id"
+      WHERE p."name" % ${dto.searchTerm} 
+      OR t."name" % ${dto.searchTerm}
     `;
 
-    if (!places || places.length === 0) {
+    if (!ids || ids.length === 0) {
       throw new NotFoundException("No place found");
     }
+    return this.prisma.place.findMany({
+      where: {
+        id: { in: ids.map(i => i.id) }
+      },
+      include: {
+        category: true,
+        placeTags: {
+          include: { tag: true }
+        },
+        reviews: {
+          select: {
+            rating: true
+          }
+        }
+      }
+    }).then(places =>
+      places.map(p => {
+        const ratings = p.reviews.map(r => r.rating);
 
-    return places;
+        const avg =
+          ratings.length > 0
+            ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+            : null;
+
+        return {
+          ...p,
+          avgRating: avg,
+        };
+      })
+    );
   }
+
 
   async update(id: string, data: UpdatePlaceDto) {
     return this.prisma.place.update({

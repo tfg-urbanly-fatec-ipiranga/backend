@@ -20,4 +20,13 @@ export class TagsService {
       where: { deletedAt: null },
     });
   }
+
+  async findByName(name: string) {
+    const normalized = name.trim().toLowerCase();
+    return this.prisma.tag.findUnique({
+      where: { name: normalized },
+      select: { id: true, name: true },
+    });
+  }
+
 }
