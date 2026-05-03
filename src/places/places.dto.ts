@@ -31,6 +31,14 @@ export class CreatePlaceDto {
   @IsString()
   @IsOptional()
   categoryId?: string;
+
+  @IsString()
+  @IsOptional()
+  embedding?: number[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
 }
 
 export class UpdatePlaceDto {
@@ -65,6 +73,13 @@ export class UpdatePlaceDto {
   @IsString()
   @IsOptional()
   categoryId?: string;
+
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
+
+  @IsOptional()
+  embedding?: number[];
 }
 
 export class FindPlacesByTagDto {
