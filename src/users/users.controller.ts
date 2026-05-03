@@ -1,5 +1,5 @@
 import {
-  Controller, Delete, Get, NotFoundException,
+  Controller, Delete, Get, NotFoundException, Patch,
   Param, ParseUUIDPipe, Post, Put, UploadedFile, UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -21,6 +21,12 @@ export class UsersController {
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Roles(Role.ADMIN)
+  @Get("inactive")
+  findInactive() {
+    return this.usersService.findInactive();
   }
 
   @Roles(Role.USER, Role.ADMIN)
@@ -62,5 +68,11 @@ export class UsersController {
     const user = await this.usersService.findById(id);
     if (!user) throw new NotFoundException("User not found");
     return this.usersService.delete(id);
+  }
+
+  @Roles(Role.ADMIN)
+  @Patch(":id/restore")
+  async restore(@Param("id", ParseUUIDPipe) id: string) {
+    return this.usersService.restore(id);
   }
 }

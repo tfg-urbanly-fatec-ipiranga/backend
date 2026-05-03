@@ -10,6 +10,7 @@ export class ReviewsService {
     id: true,
     rating: true,
     comment: true,
+    deletedAt: true,
     createdAt: true,
     updatedAt: true,
     user: { select: { id: true, firstName: true, lastName: true } },
@@ -18,26 +19,25 @@ export class ReviewsService {
 
   async findByPlace(placeId: string) {
     return this.prisma.review.findMany({
-      where: { placeId },
+      where: { placeId, deletedAt: null },
       select: this.select,
       orderBy: { createdAt: "desc" },
     });
   }
 
   async findById(id: string) {
-    return this.prisma.review.findUnique({
-      where: { id },
+    return this.prisma.review.findFirst({
+      where: { id, deletedAt: null },
       select: this.select,
     });
   }
 
   async create(data: CreateReviewDto) {
-    const existing = await this.prisma.review.findUnique({
+    const existing = await this.prisma.review.findFirst({
       where: {
-        userId_placeId: {
-          userId: data.userId,
-          placeId: data.placeId,
-        },
+        userId: data.userId,
+        placeId: data.placeId,
+        deletedAt: null,
       },
     });
 
@@ -59,6 +59,10 @@ export class ReviewsService {
   }
 
   async delete(id: string) {
-    return this.prisma.review.delete({ where: { id } });
+    return this.prisma.review.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+      select: this.select,
+    });
   }
 }

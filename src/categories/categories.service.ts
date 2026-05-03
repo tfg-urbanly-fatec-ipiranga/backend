@@ -7,11 +7,16 @@ export class CategoriesService {
   constructor(private readonly prisma: PrismaService) {}
 
   findAll() {
-    return this.prisma.category.findMany({ orderBy: { name: "asc" } });
+    return this.prisma.category.findMany({
+      where: { deletedAt: null },
+      orderBy: { name: "asc" },
+    });
   }
 
   findById(id: string) {
-    return this.prisma.category.findUnique({ where: { id } });
+    return this.prisma.category.findFirst({
+      where: { id, deletedAt: null },
+    });
   }
 
   create(data: CreateCategoryDto) {
@@ -23,6 +28,23 @@ export class CategoriesService {
   }
 
   delete(id: string) {
-    return this.prisma.category.delete({ where: { id } });
+    return this.prisma.category.update({
+      where: { id },
+      data: { active: false, deletedAt: new Date() },
+    });
+  }
+
+  findInactive() {
+    return this.prisma.category.findMany({
+      where: { deletedAt: { not: null } },
+      orderBy: { name: "asc" },
+    });
+  }
+
+  restore(id: string) {
+    return this.prisma.category.update({
+      where: { id },
+      data: { active: true, deletedAt: null },
+    });
   }
 }

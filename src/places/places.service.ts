@@ -1,6 +1,15 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { CreatePlaceDto, FindPlacesByTagDto, FullSearchDto, UpdatePlaceDto } from "./places.dto";
+import {
+  CreatePlaceDto,
+  FindPlacesByTagDto,
+  FullSearchDto,
+  UpdatePlaceDto,
+} from "./places.dto";
 import { TagsService } from "src/tags/tags.service";
 
 @Injectable()
@@ -33,14 +42,14 @@ export class PlacesService {
 
   async findAll() {
     return this.prisma.place.findMany({
-      where: { active: true },
+      where: { active: true, deletedAt: null },
       select: this.select,
     });
   }
 
   async findById(id: string) {
-    return this.prisma.place.findUnique({
-      where: { id },
+    return this.prisma.place.findFirst({
+      where: { id, deletedAt: null },
       select: this.select,
     });
   }
@@ -56,6 +65,7 @@ export class PlacesService {
     return this.prisma.place.findMany({
       where: {
         active: true,
+        deletedAt: null,
         placeTags: {
           some: {
             tag: { name: { equals: tag, mode: "insensitive" } },
@@ -135,6 +145,25 @@ export class PlacesService {
   }
 
   async delete(id: string) {
-    return this.prisma.place.delete({ where: { id } });
+    return this.prisma.place.update({
+      where: { id },
+      data: { active: false, deletedAt: new Date() },
+      select: this.select,
+    });
+  }
+
+  findInactive() {
+    return this.prisma.place.findMany({
+      where: { deletedAt: { not: null } },
+      select: this.select,
+    });
+  }
+
+  restore(id: string) {
+    return this.prisma.place.update({
+      where: { id },
+      data: { active: true, deletedAt: null },
+      select: this.select,
+    });
   }
 }

@@ -12,13 +12,15 @@ export class PlacePhotosService {
 
   async findByPlace(placeId: string) {
     return this.prisma.placePhoto.findMany({
-      where: { placeId },
+      where: { placeId, deletedAt: null },
       orderBy: [{ isPrimary: "desc" }, { createdAt: "desc" }],
     });
   }
 
   async findById(id: string) {
-    return this.prisma.placePhoto.findUnique({ where: { id } });
+    return this.prisma.placePhoto.findFirst({
+      where: { id, deletedAt: null },
+    });
   }
 
   async upload(
@@ -48,6 +50,9 @@ export class PlacePhotosService {
   }
 
   async delete(id: string) {
-    return this.prisma.placePhoto.delete({ where: { id } });
+    return this.prisma.placePhoto.update({
+      where: { id },
+      data: { active: false, deletedAt: new Date() },
+    });
   }
 }
