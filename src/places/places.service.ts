@@ -3,7 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
+import {
+  PrismaService,
+} from "src/prisma/prisma.service";
 import {
   CreatePlaceDto,
   FindPlacesByTagDto,
@@ -11,13 +13,15 @@ import {
   UpdatePlaceDto,
 } from "./places.dto";
 import { TagsService } from "src/tags/tags.service";
+import { EmbeddingsService } from "src/embeddings/embeddings.service";
 
 @Injectable()
 export class PlacesService {
   constructor(
     private prisma: PrismaService,
     private tagsService: TagsService,
-  ) {}
+    private readonly embeddingsService: EmbeddingsService,
+  ) { }
 
   private select = {
     id: true,
@@ -37,7 +41,65 @@ export class PlacesService {
   };
 
   async create(data: CreatePlaceDto) {
-    return this.prisma.place.create({ data, select: this.select });
+
+    const { tags = [], ...placeData } = data;
+    const place = await this.prisma.place.create({
+      data: placeData,
+      select: this.select
+    })
+
+    const tagPromises = tags.map(async (tagName) => {
+      await this.addTag(place.id, tagName)
+      return tagName
+    })
+
+    await Promise.all(tagPromises)
+
+    const updatedPlace = await this.prisma.place.findUnique({
+      where: { id: place.id },
+      include: {
+        placeTags: {
+          include: {
+            tag: true
+          }
+        },
+        category: true
+      }
+    })
+
+    if (!updatedPlace) {
+      throw new NotFoundException('Error returning place to generate embedding.');
+    }
+
+    const placeName = updatedPlace.name;
+    const placeDescription = updatedPlace.description ?? '';
+    const placeCategory = updatedPlace.category?.name ?? 'Geral';
+    const placeTags = updatedPlace.placeTags.map(pt => pt.tag.name);
+
+    const embedding = await this.embeddingsService.generateEmbeddings({
+      placeName,
+      placeCategory,
+      placeTags,
+      placeDescription
+    });
+
+    const vectorString = `[${embedding.join(',')}]`;
+
+    await this.prisma.$executeRaw`
+      UPDATE "Place" 
+      SET "embedding" = ${vectorString}::vector 
+      WHERE id = ${place.id}
+    `
+
+    const finalPlace = await this.prisma.place.findUnique({
+      where: { id: place.id },
+      include: {
+        placeTags: { include: { tag: true } },
+        category: true
+      }
+    })
+
+    return finalPlace;
   }
 
   async findAll() {
@@ -121,7 +183,6 @@ export class PlacesService {
       })
     );
   }
-
 
   async update(id: string, data: UpdatePlaceDto) {
     return this.prisma.place.update({
