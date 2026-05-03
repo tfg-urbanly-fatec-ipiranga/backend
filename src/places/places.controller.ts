@@ -1,6 +1,7 @@
 import {
   Controller, Delete, Get, NotFoundException, Patch,
   Param, ParseUUIDPipe, Post, Put, Query,
+  BadRequestException,
 } from "@nestjs/common";
 import { Role } from "@prisma/client";
 import { PlacesService } from "./places.service";
@@ -12,7 +13,7 @@ import { RequiredBody } from "src/common/decorators/required-body.decorator";
 
 @Controller({ version: "1", path: "places" })
 export class PlacesController {
-  constructor(private readonly placesService: PlacesService) {}
+  constructor(private readonly placesService: PlacesService) { }
 
   @Roles(Role.ADMIN)
   @Post()
@@ -24,6 +25,14 @@ export class PlacesController {
   @Get()
   findAll() {
     return this.placesService.findAll();
+  }
+
+  @Get('vibe-search')
+  async searchVibe(@Query('q') query: string) {
+    if (!query) {
+      throw new BadRequestException("Search query is required");
+    }
+    return this.placesService.findByVibe(query);
   }
 
   @Public()

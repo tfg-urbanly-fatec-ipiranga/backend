@@ -38,7 +38,7 @@ export class PlacesService {
     placeTags: {
       include: { tag: { select: { name: true } } },
     },
-  };
+  }
 
   async create(data: CreatePlaceDto) {
 
@@ -182,6 +182,68 @@ export class PlacesService {
         };
       })
     );
+  }
+
+  async findByVibe(query: string) {
+    // 1. Transforma a busca do usuário em um vetor de "vibe"
+    const queryVector = await this.embeddingsService.generateSearchEmbedding(query);
+    const vectorString = `[${queryVector.join(',')}]`;
+
+    // 2. Busca no banco apenas os IDs e a Distância, ordenados pelo pgvector
+    // Usamos o operador <=> (Similaridade de Cosseno)
+    const rankedResults = await this.prisma.$queryRaw<any[]>`
+    SELECT 
+      id, 
+      (embedding <=> ${vectorString}::vector) as distance
+    FROM "Place"
+    WHERE active = true
+    ORDER BY distance ASC
+    LIMIT 10;
+  `;
+
+    // Se a IA não encontrar nada, retornamos vazio para evitar erros no map
+    if (rankedResults.length === 0) return [];
+
+    const idsOrdenados = rankedResults.map(r => r.id);
+
+    // 3. Busca os dados completos dos locais que a IA selecionou
+    const places = await this.prisma.place.findMany({
+      where: {
+        id: { in: idsOrdenados }
+      },
+      include: {
+        category: true,
+        placeTags: {
+          include: { tag: true }
+        },
+        reviews: {
+          select: {
+            rating: true
+          }
+        }
+      }
+    });
+
+    return idsOrdenados.map(id => {
+      const p = places.find(place => place.id === id);
+
+      if (!p) return null;
+
+      const ratings = p.reviews.map(r => r.rating);
+
+      const avg =
+        ratings.length > 0
+          ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+          : null;
+
+      const distance = rankedResults.find(r => r.id === id)?.distance;
+
+      return {
+        ...p,
+        avgRating: avg,
+        score: distance ? (1 - distance).toFixed(4) : null,
+      };
+    }).filter(p => p !== null); 
   }
 
   async update(id: string, data: UpdatePlaceDto) {
