@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
 }
 
@@ -7,31 +7,25 @@ datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
   directUrl  = env("DIRECT_URL")
-  extensions = [pg_trgm]
-}
-
-enum Role {
-  USER
-  ADMIN
+  extensions = [pg_stat_statements, pg_trgm, pgcrypto, supabase_vault, uuid_ossp(map: "uuid-ossp", schema: "extensions"), vector]
 }
 
 model User {
-  id        String    @id @default(uuid())
+  id        String     @id @default(uuid())
   firstName String
   lastName  String
-  username  String    @unique
-  email     String    @unique
+  username  String     @unique
+  email     String     @unique
   password  String
-  role      Role      @default(USER)
+  role      Role       @default(USER)
   avatar    String?
   birthDate DateTime
-  active    Boolean   @default(true)
+  active    Boolean    @default(true)
   deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  reviews   Review[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   favorites Favorite[]
+  reviews   Review[]
 }
 
 model Category {
@@ -43,12 +37,11 @@ model Category {
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-
-  places Place[]
+  places      Place[]
 }
 
 model Place {
-  id          String   @id @default(uuid())
+  id          String                 @id @default(uuid())
   name        String
   description String?
   address     String?
@@ -57,28 +50,26 @@ model Place {
   closingTime String
   latitude    Float
   longitude   Float
-  active      Boolean   @default(true)
+  active      Boolean                @default(true)
   deletedAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
-
-  placeTags PlaceTag[]
-  reviews   Review[]
-  favorites Favorite[]
-  photos    PlacePhoto[]
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  categoryId  String?
+  embedding   Unsupported("vector")?
+  favorites   Favorite[]
+  category    Category?              @relation(fields: [categoryId], references: [id])
+  photos      PlacePhoto[]
+  placeTags   PlaceTag[]
+  reviews     Review[]
 }
 
 model Tag {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  active    Boolean   @default(true)
+  id        String     @id @default(uuid())
+  name      String     @unique
+  active    Boolean    @default(true)
   deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   placeTags PlaceTag[]
 }
 
@@ -87,9 +78,8 @@ model PlaceTag {
   tagId     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  place Place @relation(fields: [placeId], references: [id])
-  tag   Tag   @relation(fields: [tagId], references: [id])
+  place     Place    @relation(fields: [placeId], references: [id])
+  tag       Tag      @relation(fields: [tagId], references: [id])
 
   @@id([placeId, tagId])
 }
@@ -98,14 +88,14 @@ model Review {
   id        String    @id @default(uuid())
   rating    Int
   comment   String?
+  active    Boolean   @default(false)
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-
-  userId  String
-  placeId String
-  user    User  @relation(fields: [userId], references: [id])
-  place   Place @relation(fields: [placeId], references: [id])
+  userId    String
+  placeId   String
+  place     Place     @relation(fields: [placeId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 
   @@unique([userId, placeId])
 }
@@ -113,11 +103,10 @@ model Review {
 model Favorite {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
-
-  userId  String
-  placeId String
-  user    User  @relation(fields: [userId], references: [id])
-  place   Place @relation(fields: [placeId], references: [id])
+  userId    String
+  placeId   String
+  place     Place    @relation(fields: [placeId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, placeId])
 }
@@ -130,7 +119,11 @@ model PlacePhoto {
   active    Boolean   @default(true)
   deletedAt DateTime?
   createdAt DateTime  @default(now())
+  placeId   String
+  place     Place     @relation(fields: [placeId], references: [id])
+}
 
-  placeId String
-  place   Place @relation(fields: [placeId], references: [id])
+enum Role {
+  USER
+  ADMIN
 }

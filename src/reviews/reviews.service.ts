@@ -13,13 +13,14 @@ export class ReviewsService {
     deletedAt: true,
     createdAt: true,
     updatedAt: true,
+    active: true,
     user: { select: { id: true, firstName: true, lastName: true } },
     place: { select: { id: true, name: true } },
   };
 
   async findByPlace(placeId: string) {
     return this.prisma.review.findMany({
-      where: { placeId, deletedAt: null },
+      where: { placeId, deletedAt: null, active: true },
       select: this.select,
       orderBy: { createdAt: "desc" },
     });
@@ -27,7 +28,7 @@ export class ReviewsService {
 
   async findById(id: string) {
     return this.prisma.review.findFirst({
-      where: { id, deletedAt: null },
+      where: { id, deletedAt: null, active: true },
       select: this.select,
     });
   }
@@ -47,7 +48,10 @@ export class ReviewsService {
       );
     }
 
-    return this.prisma.review.create({ data, select: this.select });
+    return this.prisma.review.create({
+      data: { ...data, active: false },
+      select: this.select,
+    });
   }
 
   async update(id: string, data: UpdateReviewDto) {
