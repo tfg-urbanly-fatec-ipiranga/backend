@@ -4,7 +4,7 @@ import { CreateReviewDto, UpdateReviewDto } from "./reviews.dto";
 
 @Injectable()
 export class ReviewsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private readonly select = {
     id: true,
@@ -28,7 +28,7 @@ export class ReviewsService {
 
   async findById(id: string) {
     return this.prisma.review.findFirst({
-      where: { id, deletedAt: null, active: true },
+      where: { id, deletedAt: null },
       select: this.select,
     });
   }
@@ -68,5 +68,25 @@ export class ReviewsService {
       data: { deletedAt: new Date() },
       select: this.select,
     });
+  }
+
+  async findPending() {
+    return this.prisma.review.findMany({
+      where: { active: false },
+      select: this.select,
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  async approve(id: string) {
+    return this.prisma.review.update({
+      where: { id },
+      data: { active: true },
+      select: this.select,
+    });
+  }
+
+  async reject(id: string) {
+    return this.prisma.review.delete({ where: { id } });
   }
 }

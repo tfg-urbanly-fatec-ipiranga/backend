@@ -11,7 +11,29 @@ import { Role } from "@prisma/client";
 @Controller({ version: "1", path: "reviews" })
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
-
+  
+  @Roles(Role.ADMIN)
+  @Get("pending")
+  findPending() {
+    return this.reviewsService.findPending();
+  }
+  
+  @Roles(Role.ADMIN)
+  @Post("approve/:id")
+  async approve(@Param("id", ParseUUIDPipe) id: string) {
+    const review = await this.reviewsService.findById(id);
+    if (!review) throw new NotFoundException("Review Not Found");
+    return this.reviewsService.approve(id);
+  } 
+  
+  @Roles(Role.ADMIN)
+  @Post("reject/:id")
+  async reject(@Param("id", ParseUUIDPipe) id: string) {
+    const review = await this.reviewsService.findById(id);
+    if (!review) throw new NotFoundException("Review Not Found");
+    return this.reviewsService.reject(id);
+  }
+  
   @Roles(Role.ADMIN, Role.USER)
   @Get("place/:placeId")
   findByPlace(@Param("placeId", ParseUUIDPipe) placeId: string) {
@@ -47,7 +69,8 @@ export class ReviewsController {
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const review = await this.reviewsService.findById(id);
-    if (!review) throw new NotFoundException("Avaliação não encontrada");
+    if (!review) throw new NotFoundException("Review Not Found");
     return this.reviewsService.delete(id);
   }
+
 }
