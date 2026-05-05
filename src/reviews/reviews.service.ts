@@ -4,7 +4,7 @@ import { CreateReviewDto, UpdateReviewDto } from "./reviews.dto";
 
 @Injectable()
 export class ReviewsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private readonly select = {
     id: true,
@@ -13,13 +13,14 @@ export class ReviewsService {
     deletedAt: true,
     createdAt: true,
     updatedAt: true,
+    active: true,
     user: { select: { id: true, firstName: true, lastName: true } },
     place: { select: { id: true, name: true } },
   };
 
   async findByPlace(placeId: string) {
     return this.prisma.review.findMany({
-      where: { placeId, deletedAt: null },
+      where: { placeId, deletedAt: null, active: true },
       select: this.select,
       orderBy: { createdAt: "desc" },
     });
@@ -47,7 +48,10 @@ export class ReviewsService {
       );
     }
 
-    return this.prisma.review.create({ data, select: this.select });
+    return this.prisma.review.create({
+      data: { ...data, active: false },
+      select: this.select,
+    });
   }
 
   async update(id: string, data: UpdateReviewDto) {
@@ -64,5 +68,25 @@ export class ReviewsService {
       data: { deletedAt: new Date() },
       select: this.select,
     });
+  }
+
+  async findPending() {
+    return this.prisma.review.findMany({
+      where: { active: false },
+      select: this.select,
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  async approve(id: string) {
+    return this.prisma.review.update({
+      where: { id },
+      data: { active: true },
+      select: this.select,
+    });
+  }
+
+  async reject(id: string) {
+    return this.prisma.review.delete({ where: { id } });
   }
 }
