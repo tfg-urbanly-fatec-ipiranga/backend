@@ -76,20 +76,28 @@ export class PlacesService {
     const placeCategory = updatedPlace.category?.name ?? 'Geral';
     const placeTags = updatedPlace.placeTags.map(pt => pt.tag.name);
 
-    const embedding = await this.embeddingsService.generateEmbeddings({
-      placeName,
-      placeCategory,
-      placeTags,
-      placeDescription
-    });
+    let embedding: number[] | null = null;
 
-    const vectorString = `[${embedding.join(',')}]`;
+    try {
+      embedding = await this.embeddingsService.generateEmbeddings({
+        placeName,
+        placeCategory,
+        placeTags,
+        placeDescription
+      });
+    } catch (error) {
+      console.error(error);
+    }
 
-    await this.prisma.$executeRaw`
-      UPDATE "Place" 
-      SET "embedding" = ${vectorString}::vector 
-      WHERE id = ${place.id}
-    `
+    if (embedding && embedding.length > 0) {
+      const vectorString = `[${embedding.join(',')}]`;
+
+      await this.prisma.$executeRaw`
+    UPDATE "Place" 
+    SET "embedding" = ${vectorString}::vector 
+    WHERE id = ${place.id}
+  `;
+    }
 
     const finalPlace = await this.prisma.place.findUnique({
       where: { id: place.id },
@@ -243,7 +251,7 @@ export class PlacesService {
         avgRating: avg,
         score: distance ? (1 - distance).toFixed(4) : null,
       };
-    }).filter(p => p !== null); 
+    }).filter(p => p !== null);
   }
 
   async update(id: string, data: UpdatePlaceDto) {
