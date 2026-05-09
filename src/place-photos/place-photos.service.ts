@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CloudinaryService } from "src/common/services/cloudinary/cloudinary.service";
 import { UpdatePlacePhotoDto } from "./place-photos.dto";
@@ -45,9 +45,39 @@ export class PlacePhotosService {
     });
   }
 
-  async update(id: string, data: UpdatePlacePhotoDto) {
-    return this.prisma.placePhoto.update({ where: { id }, data });
+async update(id: string, data: UpdatePlacePhotoDto) {
+
+  // busca foto atual
+  const currentPhoto = await this.prisma.placePhoto.findUnique({
+    where: { id },
+  });
+
+  if (!currentPhoto) {
+    throw new NotFoundException('Photo not found');
   }
+
+  // se virou primária
+  if (data.isPrimary === true) {
+
+    // remove primary das outras
+    await this.prisma.placePhoto.updateMany({
+      where: {
+        placeId: currentPhoto.placeId,
+        NOT: {
+          id,
+        },
+      },
+      data: {
+        isPrimary: false,
+      },
+    });
+  }
+  // atualiza a foto atual
+  return this.prisma.placePhoto.update({
+    where: { id },
+    data,
+  });
+}
 
   async delete(id: string) {
     return this.prisma.placePhoto.update({
