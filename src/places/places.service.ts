@@ -38,6 +38,12 @@ export class PlacesService {
     placeTags: {
       include: { tag: { select: { name: true } } },
     },
+      photos: { select: {
+        id: true,
+        url: true,
+        isPrimary: true,
+      },
+    },
   }
 
   async create(data: CreatePlaceDto) {
