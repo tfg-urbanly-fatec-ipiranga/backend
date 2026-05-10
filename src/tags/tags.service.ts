@@ -16,9 +16,7 @@ export class TagsService {
   }
 
   async findAll() {
-    return this.prisma.tag.findMany({
-      where: { deletedAt: null },
-    });
+    return this.prisma.tag.findMany();
   }
 
   async findByName(name: string) {
@@ -28,5 +26,4 @@ export class TagsService {
       select: { id: true, name: true },
     });
   }
-
 }
