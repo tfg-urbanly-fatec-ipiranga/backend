@@ -4,16 +4,16 @@ import { CreateReviewDto, UpdateReviewDto } from "./reviews.dto";
 
 @Injectable()
 export class ReviewsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private readonly select = {
     id: true,
     rating: true,
     comment: true,
+    active: true,
     deletedAt: true,
     createdAt: true,
     updatedAt: true,
-    active: true,
     user: { select: { id: true, firstName: true, lastName: true } },
     place: { select: { id: true, name: true } },
   };
@@ -70,9 +70,11 @@ export class ReviewsService {
     });
   }
 
+  // --- Moderação ---
+
   async findPending() {
     return this.prisma.review.findMany({
-      where: { active: false },
+      where: { active: false, deletedAt: null },
       select: this.select,
       orderBy: { createdAt: "desc" },
     });
@@ -87,6 +89,28 @@ export class ReviewsService {
   }
 
   async reject(id: string) {
-    return this.prisma.review.delete({ where: { id } });
+    return this.prisma.review.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+      select: this.select,
+    });
+  }
+
+  // --- Soft delete admin ---
+
+  async findInactive() {
+    return this.prisma.review.findMany({
+      where: { deletedAt: { not: null } },
+      select: this.select,
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  async restore(id: string) {
+    return this.prisma.review.update({
+      where: { id },
+      data: { deletedAt: null },
+      select: this.select,
+    });
   }
 }

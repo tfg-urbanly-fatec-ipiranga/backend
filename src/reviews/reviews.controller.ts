@@ -1,5 +1,5 @@
 import {
-  Controller, Delete, Get, NotFoundException,
+  Controller, Delete, Get, NotFoundException, Patch,
   Param, ParseUUIDPipe, Post, Put,
 } from "@nestjs/common";
 import { RequiredBody } from "src/common/decorators/required-body.decorator";
@@ -11,29 +11,19 @@ import { Role } from "@prisma/client";
 @Controller({ version: "1", path: "reviews" })
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
-  
+
   @Roles(Role.ADMIN)
   @Get("pending")
   findPending() {
     return this.reviewsService.findPending();
   }
-  
+
   @Roles(Role.ADMIN)
-  @Post("approve/:id")
-  async approve(@Param("id", ParseUUIDPipe) id: string) {
-    const review = await this.reviewsService.findById(id);
-    if (!review) throw new NotFoundException("Review Not Found");
-    return this.reviewsService.approve(id);
-  } 
-  
-  @Roles(Role.ADMIN)
-  @Post("reject/:id")
-  async reject(@Param("id", ParseUUIDPipe) id: string) {
-    const review = await this.reviewsService.findById(id);
-    if (!review) throw new NotFoundException("Review Not Found");
-    return this.reviewsService.reject(id);
+  @Get("inactive")
+  findInactive() {
+    return this.reviewsService.findInactive();
   }
-  
+
   @Roles(Role.ADMIN, Role.USER)
   @Get("place/:placeId")
   findByPlace(@Param("placeId", ParseUUIDPipe) placeId: string) {
@@ -69,8 +59,29 @@ export class ReviewsController {
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const review = await this.reviewsService.findById(id);
-    if (!review) throw new NotFoundException("Review Not Found");
+    if (!review) throw new NotFoundException("Avaliação não encontrada");
     return this.reviewsService.delete(id);
   }
 
+  @Roles(Role.ADMIN)
+  @Patch(":id/approve")
+  async approve(@Param("id", ParseUUIDPipe) id: string) {
+    const review = await this.reviewsService.findById(id);
+    if (!review) throw new NotFoundException("Avaliação não encontrada");
+    return this.reviewsService.approve(id);
+  }
+
+  @Roles(Role.ADMIN)
+  @Patch(":id/reject")
+  async reject(@Param("id", ParseUUIDPipe) id: string) {
+    const review = await this.reviewsService.findById(id);
+    if (!review) throw new NotFoundException("Avaliação não encontrada");
+    return this.reviewsService.reject(id);
+  }
+
+  @Roles(Role.ADMIN)
+  @Patch(":id/restore")
+  async restore(@Param("id", ParseUUIDPipe) id: string) {
+    return this.reviewsService.restore(id);
+  }
 }

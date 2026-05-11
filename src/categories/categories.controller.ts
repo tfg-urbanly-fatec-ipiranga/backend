@@ -1,5 +1,5 @@
 import {
-  Controller, Delete, Get, NotFoundException, Patch,
+  Controller, Delete, Get, NotFoundException,
   Param, ParseUUIDPipe, Post, Put,
 } from "@nestjs/common";
 import { Role } from "@prisma/client";
@@ -16,12 +16,6 @@ export class CategoriesController {
   @Get()
   findAll() {
     return this.categoriesService.findAll();
-  }
-
-  @Roles(Role.ADMIN)
-  @Get("inactive")
-  findInactive() {
-    return this.categoriesService.findInactive();
   }
 
   @Roles(Role.ADMIN, Role.USER)
@@ -55,11 +49,5 @@ export class CategoriesController {
     const category = await this.categoriesService.findById(id);
     if (!category) throw new NotFoundException("Categoria não encontrada");
     return this.categoriesService.delete(id);
-  }
-
-  @Roles(Role.ADMIN)
-  @Patch(":id/restore")
-  async restore(@Param("id", ParseUUIDPipe) id: string) {
-    return this.categoriesService.restore(id);
   }
 }

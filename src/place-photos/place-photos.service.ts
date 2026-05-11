@@ -12,14 +12,14 @@ export class PlacePhotosService {
 
   async findByPlace(placeId: string) {
     return this.prisma.placePhoto.findMany({
-      where: { placeId, deletedAt: null },
+      where: { placeId },
       orderBy: [{ isPrimary: "desc" }, { createdAt: "desc" }],
     });
   }
 
   async findById(id: string) {
-    return this.prisma.placePhoto.findFirst({
-      where: { id, deletedAt: null },
+    return this.prisma.placePhoto.findUnique({
+      where: { id },
     });
   }
 
@@ -80,9 +80,6 @@ async update(id: string, data: UpdatePlacePhotoDto) {
 }
 
   async delete(id: string) {
-    return this.prisma.placePhoto.update({
-      where: { id },
-      data: { active: false, deletedAt: new Date() },
-    });
+    return this.prisma.placePhoto.delete({ where: { id } });
   }
 }
