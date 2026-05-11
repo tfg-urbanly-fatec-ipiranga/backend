@@ -117,9 +117,46 @@ export class PlacesService {
   }
 
   async findAll() {
-    return this.prisma.place.findMany({
+    const places = await this.prisma.place.findMany({
       where: { active: true, deletedAt: null },
-      select: this.select,
+      include: {
+        category: true,
+        placeTags: {
+          include: {
+            tag: {
+              select: {
+                name: true
+              }
+            }
+          }
+        },
+        photos: {
+          select: {
+            id: true,
+            url: true,
+            isPrimary: true,
+          }
+        },
+        reviews: {
+          select: {
+            rating: true
+          }
+        }
+      },
+    });
+
+    return places.map(p => {
+      const ratings = p.reviews.map(r => r.rating);
+
+      const avg =
+        ratings.length > 0
+          ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+          : null;
+
+      return {
+        ...p,
+        avgRating: avg,
+      };
     });
   }
 
