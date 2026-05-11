@@ -205,7 +205,9 @@ export class PlacesService {
     }
     return this.prisma.place.findMany({
       where: {
-        id: { in: ids.map(i => i.id) }
+        id: { in: ids.map(i => i.id) },
+        active: true,
+        deletedAt: null,
       },
       include: {
         category: true,
@@ -215,6 +217,13 @@ export class PlacesService {
         reviews: {
           select: {
             rating: true
+          }
+        },
+        photos: {
+          select: {
+            id: true,
+            url: true,
+            isPrimary: true,
           }
         }
       }
