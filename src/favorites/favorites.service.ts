@@ -10,7 +10,7 @@ export class FavoritesService {
     id: true,
     createdAt: true,
     place: {
-      select: { id: true, name: true, city: true, category: { select: { name: true } } },
+      select: { id: true, name: true, city: true, category: { select: { name: true } }, photos: { select:  { id: true, url: true, isPrimary: true } } },
     },
   };
 
