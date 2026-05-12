@@ -62,7 +62,7 @@ export class UsersController {
     return this.usersService.findById(userId);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.USER, Role.ADMIN)
   @Delete(":id")
   async delete(@Param("id", ParseUUIDPipe) id: string) {
     const user = await this.usersService.findById(id);
