@@ -66,6 +66,20 @@ async function main() {
     },
   });
 
+  const user4 = await prisma.user.upsert({
+    where: { email: "evilly@admin.com" },
+    update: {},
+    create: {
+      firstName: "Evilly",
+      lastName: "Costa",
+      username: "evicosta",
+      email: "evilly@admin.com",
+      password: userPassword,
+      role: Role.ADMIN,
+      birthDate: new Date("2000-11-08"),
+    },
+  });
+
   console.log("✅ Users created");
 
   // --- Categories ---
@@ -128,6 +142,7 @@ async function main() {
         city: "São Paulo",
         openingTime: "07:00",
         closingTime: "20:00",
+        workingDays: "Seg - Sex",
         latitude: -23.5535,
         longitude: -46.6544,
         categoryId: cafeteria.id,
@@ -141,6 +156,7 @@ async function main() {
         city: "São Paulo",
         openingTime: "17:00",
         closingTime: "02:00",
+        workingDays: "Seg - Sex",
         latitude: -23.5489,
         longitude: -46.6528,
         categoryId: bar.id,
@@ -154,6 +170,7 @@ async function main() {
         city: "São Paulo",
         openingTime: "11:00",
         closingTime: "15:00",
+        workingDays: "Seg - Sex",
         latitude: -23.5613,
         longitude: -46.6558,
         categoryId: restaurante.id,
@@ -167,6 +184,7 @@ async function main() {
         city: "São Paulo",
         openingTime: "06:00",
         closingTime: "21:00",
+        workingDays: "Seg - Sex",
         latitude: -23.5622,
         longitude: -46.6720,
         categoryId: padaria.id,
@@ -180,6 +198,7 @@ async function main() {
         city: "São Paulo",
         openingTime: "05:00",
         closingTime: "00:00",
+        workingDays: "Seg - Sex",
         latitude: -23.5874,
         longitude: -46.6576,
         categoryId: parque.id,
@@ -193,6 +212,7 @@ async function main() {
         city: "São Paulo",
         openingTime: "18:00",
         closingTime: "01:00",
+        workingDays: "Seg - Sex",
         latitude: -23.5567,
         longitude: -46.6690,
         categoryId: bar.id,
@@ -206,6 +226,7 @@ async function main() {
         city: "São Paulo",
         openingTime: "08:00",
         closingTime: "17:00",
+        workingDays: "Seg - Sex",
         latitude: -23.5670,
         longitude: -46.6910,
         categoryId: cafeteria.id,
@@ -219,6 +240,7 @@ async function main() {
         city: "São Paulo",
         openingTime: "12:00",
         closingTime: "23:00",
+        workingDays: "Seg - Sex",
         latitude: -23.5560,
         longitude: -46.6630,
         categoryId: restaurante.id,

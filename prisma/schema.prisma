@@ -48,6 +48,7 @@ model Place {
   city        String?
   openingTime String
   closingTime String
+  workingDays String?
   latitude    Float
   longitude   Float
   active      Boolean                @default(true)
