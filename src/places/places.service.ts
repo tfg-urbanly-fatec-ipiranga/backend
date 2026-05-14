@@ -34,6 +34,8 @@ export class PlacesService {
     active: true,
     openingTime: true,
     closingTime: true,
+    workingDays: true,
+    priceLevel: true,
     category: { select: { id: true, name: true } },
     placeTags: {
       include: { tag: { select: { name: true } } },

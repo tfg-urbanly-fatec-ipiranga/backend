@@ -1,4 +1,5 @@
-import { IsString, IsOptional, IsNumber, IsBoolean } from "class-validator";
+import { IsString, IsOptional, IsNumber, IsBoolean, IsEnum } from "class-validator";
+import { PriceLevel } from "@prisma/client";
 
 export class CreatePlaceDto {
   @IsString()
@@ -27,6 +28,14 @@ export class CreatePlaceDto {
 
   @IsNumber()
   longitude: number;
+
+  @IsString()
+  @IsOptional()
+  workingDays?: string;
+
+  @IsEnum(PriceLevel)
+  @IsOptional()
+  priceLevel?: PriceLevel;
 
   @IsString()
   @IsOptional()
@@ -65,6 +74,14 @@ export class UpdatePlaceDto {
   @IsString()
   @IsOptional()
   closingTime?: string;
+
+  @IsString()
+  @IsOptional()
+  workingDays?: string;
+
+  @IsEnum(PriceLevel)
+  @IsOptional()
+  priceLevel?: PriceLevel;
 
   @IsBoolean()
   @IsOptional()
