@@ -309,6 +309,7 @@ export class PlacesService {
   }
 
   async update(id: string, data: UpdatePlaceDto) {
+    const { tags, ...updateData } = data;
     return this.prisma.place.update({
       where: { id },
       data,
