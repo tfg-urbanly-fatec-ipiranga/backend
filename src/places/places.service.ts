@@ -140,6 +140,9 @@ export class PlacesService {
           }
         },
         reviews: {
+          where: {
+            active: true
+          },
           select: {
             rating: true
           }
@@ -217,6 +220,9 @@ export class PlacesService {
           include: { tag: true }
         },
         reviews: {
+          where: {
+            active: true
+          },
           select: {
             rating: true
           }
@@ -279,6 +285,9 @@ export class PlacesService {
           include: { tag: true }
         },
         reviews: {
+          where: {
+            active: true
+          },
           select: {
             rating: true
           }
