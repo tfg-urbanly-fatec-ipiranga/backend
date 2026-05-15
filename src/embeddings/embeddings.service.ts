@@ -29,9 +29,7 @@ export class EmbeddingsService {
 		}
 		catch (error) {
 			console.error('Error calling Ollama:', error.message);
-			throw new InternalServerErrorException(
-				'Error processing local artificial intelligence.',
-			);
+			throw new Error('Ollama unavailable: ' + error.message);
 		}
 	}
 
@@ -67,9 +65,7 @@ export class EmbeddingsService {
 		}
 		catch (error) {
 			console.error('Error calling Ollama:', error.message);
-			throw new InternalServerErrorException(
-				'Error processing local artificial intelligence.',
-			);
+			throw new Error('Ollama unavailable: ' + error.message);
 		}
 	}
 }
