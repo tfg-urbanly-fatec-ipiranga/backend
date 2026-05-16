@@ -57,7 +57,10 @@ export class ReviewsService {
   async update(id: string, data: UpdateReviewDto) {
     return this.prisma.review.update({
       where: { id },
-      data,
+      data: {
+        ...data,
+        active: false,
+      },
       select: this.select,
     });
   }
